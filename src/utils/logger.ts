@@ -25,8 +25,21 @@ class Logger {
     // Log to console in development
     if (process.env.NODE_ENV !== 'production') {
       this.logger.add(new winston.transports.Console({
-        format: winston.format.simple()
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json(),
+          winston.format.prettyPrint()
+        ),
+        level: 'debug'
       }));
+    } else {
+      this.logger.add(new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json()
+        )
+      }));
+
     }
   }
 

@@ -5,21 +5,8 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService } from './services/index.js';
 import { Logger } from './utils/logger.js';
-
-interface SearchEmployeeParams {
-  q: string;
-  limit?: number;
-}
-
-interface RegisterBreakfastParams {
-  maNhanVien: string;
-  thoiGian: string;
-  soLuongAnSang?: number;
-  soLuongCafe?: number;
-  soLuongSuaChua?: number;
-}
 
 interface Tool {
   description: string;
@@ -34,14 +21,26 @@ class ApiServer {
   private server: Server;
   private logger: Logger;
   private tools: Record<string, Tool>;
+  private hoaChatService: HoaChatService;
+  private statusService: StatusService;
 
   constructor() {
+    this.hoaChatService = new HoaChatService();
+    this.statusService = new StatusService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
     };
 
     this.tools = {
+      check_connection: {
+        description: 'Kiểm tra kết nối tới API server',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+      },
       search_employee: {
         description: 'Tìm kiếm nhân viên theo tên hoặc mã',
         inputSchema: {
@@ -66,10 +65,30 @@ class ApiServer {
           },
           required: ['maNhanVien', 'thoiGian']
         }
+      },
+      update_hoa_chat: {
+        description: 'Cập nhật thông tin hóa chất theo ca',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            ngay: { type: 'string', description: 'Ngày (ISO format)' },
+            ca: { type: 'number', description: 'Ca làm việc' },
+            hV_Voi: { type: 'number', description: 'HV Vôi' },
+            hV_Clo: { type: 'number', description: 'HV Clo' },
+            hV_PAC: { type: 'number', description: 'HV PAC' },
+            cB_Voi: { type: 'number', description: 'CB Vôi' },
+            cB_Clo: { type: 'number', description: 'CB Clo' },
+            cB_PAC: { type: 'number', description: 'CB PAC' },
+            hN_Voi: { type: 'number', description: 'HN Vôi' },
+            hN_Clo: { type: 'number', description: 'HN Clo' },
+            hN_PAC: { type: 'number', description: 'HN PAC' }
+          },
+          required: ['ngay', 'ca']
+        }
       }
     };
 
-    this.server = new Server(serverConfig, { 
+    this.server = new Server(serverConfig, {
       capabilities: {
         tools: this.tools
       }
@@ -100,6 +119,17 @@ class ApiServer {
       });
 
       switch (request.params.name) {
+        case 'check_connection': {
+          try {
+            const result = await this.statusService.checkConnection();
+            this.logger.info('Kiểm tra kết nối thành công', { result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi kiểm tra kết nối', { error });
+            return createResponse('Không thể kết nối tới API server');
+          }
+        }
+
         case 'search_employee': {
           const args = request.params.arguments || {};
           const params = {
@@ -147,6 +177,36 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi đăng ký ăn sáng', { params, error });
             return createResponse('Có lỗi xảy ra khi đăng ký ăn sáng');
+          }
+        }
+
+        case 'update_hoa_chat': {
+          const args = request.params.arguments || {};
+          const params = {
+            ngay: String(args.ngay || ''),
+            ca: Number(args.ca || 0),
+            hV_Voi: Number(args.hV_Voi),
+            hV_Clo: Number(args.hV_Clo),
+            hV_PAC: Number(args.hV_PAC),
+            cB_Voi: Number(args.cB_Voi),
+            cB_Clo: Number(args.cB_Clo),
+            cB_PAC: Number(args.cB_PAC),
+            hN_Voi: Number(args.hN_Voi),
+            hN_Clo: Number(args.hN_Clo),
+            hN_PAC: Number(args.hN_PAC)
+          };
+
+          if (!params.ngay || !params.ca) {
+            return createResponse('Thiếu tham số bắt buộc (ngay, ca)');
+          }
+
+          try {
+            const result = await this.hoaChatService.updateHoaChatSXN(params);
+            this.logger.info('Cập nhật hóa chất thành công', { args, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật hóa chất', { args, error });
+            return createResponse('Có lỗi xảy ra khi cập nhật hóa chất' + { args, error });
           }
         }
 

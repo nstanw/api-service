@@ -1,3 +1,16 @@
+export interface UpdateHoaChatSXNInput {
+  ngay: string;
+  ca: number;
+  hV_Voi?: number;
+  hV_Clo?: number; 
+  hV_PAC?: number;
+  cB_Voi?: number;
+  cB_Clo?: number;
+  cB_PAC?: number;
+  hN_Voi?: number;
+  hN_Clo?: number;
+  hN_PAC?: number;
+}
 export interface Employee {
   id: string;
   name: string;

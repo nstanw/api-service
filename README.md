@@ -1,70 +1,80 @@
-# api-service MCP Server
+# MCP API Service
 
-A Model Context Protocol server
+Một máy chủ Model Context Protocol (MCP) để tương tác với API hệ thống
 
-This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
+## Tính năng
 
-- Resources representing text notes with URIs and metadata
-- Tools for creating new notes
-- Prompts for generating summaries of notes
+### Công cụ
+- `check_connection` - Kiểm tra kết nối tới API server
+- `search_employee` - Tìm kiếm nhân viên theo tên hoặc mã
+- `register_breakfast` - Đăng ký ăn sáng cho nhân viên
+- `update_hoa_chat` - Cập nhật thông tin hóa chất theo ca
 
-## Features
+## Phát triển
 
-### Resources
-- List and access notes via `note://` URIs
-- Each note has a title, content and metadata
-- Plain text mime type for simple content access
-
-### Tools
-- `create_note` - Create new text notes
-  - Takes title and content as required parameters
-  - Stores note in server state
-
-### Prompts
-- `summarize_notes` - Generate a summary of all stored notes
-  - Includes all note contents as embedded resources
-  - Returns structured prompt for LLM summarization
-
-## Development
-
-Install dependencies:
+Cài đặt thư viện:
 ```bash
 npm install
 ```
 
-Build the server:
+Build server:
 ```bash
 npm run build
 ```
 
-For development with auto-rebuild:
+Chạy chế độ phát triển với tự động build lại:
 ```bash
 npm run watch
 ```
 
-## Installation
+## Cài đặt
 
-To use with Claude Desktop, add the server config:
+Để sử dụng với Claude Desktop, thêm cấu hình server vào file:
 
-On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "api-service": {
-      "command": "/path/to/api-service/build/index.js"
+      "command": "đường-dẫn-tới/api-service/build/index.js"
     }
   }
 }
 ```
 
-### Debugging
+### Gỡ lỗi
 
-Since MCP servers communicate over stdio, debugging can be challenging. We recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), which is available as a package script:
+Máy chủ MCP hoạt động bằng cách giao tiếp qua stdio (standard input/output). Stdio là các kênh giao tiếp chuẩn trong lập trình, tương tự như việc:
+
+- **Standard Input (stdin)**: Giống như cách bạn nhập lệnh vào Terminal/Command Prompt
+- **Standard Output (stdout)**: Nơi hiển thị kết quả, giống như khi Terminal hiện thông báo thành công
+- **Standard Error (stderr)**: Kênh riêng để hiện thông báo lỗi, giống như khi Terminal báo "file không tồn tại"
+
+Trong trường hợp máy chủ MCP:
+- Nhận yêu cầu từ người dùng qua stdin (ví dụ: lệnh tìm kiếm nhân viên)
+- Trả kết quả qua stdout (ví dụ: thông tin nhân viên tìm được)
+- Ghi các lỗi gặp phải qua stderr (ví dụ: lỗi kết nối database)
+
+Điều này gây khó khăn cho việc gỡ lỗi vì:
+- Không thể đặt breakpoint và debug trực tiếp như với ứng dụng thông thường
+- Khó theo dõi luồng dữ liệu vào/ra
+- Log lỗi có thể bị trộn lẫn với output
+
+Để giải quyết vấn đề này, chúng tôi khuyến nghị sử dụng [MCP Inspector](https://github.com/modelcontextprotocol/inspector). Đây là công cụ giúp:
+- Theo dõi chi tiết các yêu cầu gửi đến máy chủ
+- Xem kết quả trả về của từng yêu cầu
+- Kiểm tra log lỗi một cách riêng biệt
+- Giám sát hiệu năng của máy chủ
+
+Để khởi động Inspector:
 
 ```bash
 npm run inspector
 ```
 
-The Inspector will provide a URL to access debugging tools in your browser.
+Inspector sẽ cung cấp một URL để truy cập giao diện web. Tại đây bạn có thể:
+- Xem realtime các yêu cầu đang được xử lý
+- Kiểm tra chi tiết từng request/response
+- Tìm kiếm và lọc các log
+- Theo dõi metrics về hiệu năng

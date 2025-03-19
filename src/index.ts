@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -24,11 +24,13 @@ class ApiServer {
   private hoaChatService: HoaChatService;
   private statusService: StatusService;
   private xoaAnhNghiemThuService: XoaAnhNghiemThuService;
+  private lenhDieuXeMayService: LenhDieuXeMayService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
     this.statusService = new StatusService();
     this.xoaAnhNghiemThuService = new XoaAnhNghiemThuService();
+    this.lenhDieuXeMayService = new LenhDieuXeMayService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -96,6 +98,22 @@ class ApiServer {
             resourceId: { type: 'string', description: 'ID của resource cần xóa (UUID)' }
           },
           required: ['resourceId']
+        }
+      },
+      update_lenh_dieu_xe_may: {
+        description: 'Cập nhật thông tin lệnh điều xe máy',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            Code: { type: 'string', description: 'Mã lệnh điều xe' },
+            ViTriBatDau: { type: 'string', description: 'Vị trí bắt đầu' },
+            ViTriHoanThanh: { type: 'string', description: 'Vị trí hoàn thành' },
+            ChiSoDongHoCongToMetBatDau: { type: 'number', description: 'Chỉ số đồng hồ công tơ mét bắt đầu' },
+            ChiSoDongHoCongToMetHoanThanh: { type: 'number', description: 'Chỉ số đồng hồ công tơ mét hoàn thành' },
+            ThoiGianBatDau: { type: 'string', description: 'Thời gian bắt đầu (ISO format)' },
+            ThoiGianHoanThanh: { type: 'string', description: 'Thời gian hoàn thành (ISO format)' }
+          },
+          required: ['Code']
         }
       }
     };
@@ -239,6 +257,32 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi xóa ảnh nghiệm thu', { params, error });
             return createResponse('Có lỗi xảy ra khi xóa ảnh nghiệm thu' +  JSON.stringify(params) + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'update_lenh_dieu_xe_may': {
+          const args = request.params.arguments || {};
+            const params = {
+            Code: String(args.Code || ''),
+            ViTriBatDau: args.ViTriBatDau ? String(args.ViTriBatDau) : undefined,
+            ViTriHoanThanh: args.ViTriHoanThanh ? String(args.ViTriHoanThanh) : undefined,
+            ChiSoDongHoCongToMetBatDau: args.ChiSoDongHoCongToMetBatDau !== undefined ? Number(args.ChiSoDongHoCongToMetBatDau) : undefined,
+            ChiSoDongHoCongToMetHoanThanh: args.ChiSoDongHoCongToMetHoanThanh !== undefined ? Number(args.ChiSoDongHoCongToMetHoanThanh) : undefined,
+            ThoiGianBatDau: args.ThoiGianBatDau ? String(args.ThoiGianBatDau) : undefined,
+            ThoiGianHoanThanh: args.ThoiGianHoanThanh ? String(args.ThoiGianHoanThanh) : undefined
+            };
+
+          // if (!params.Code) {
+          //   return createResponse('Thiếu tham số bắt buộc (code)');
+          // }
+
+          try {
+            const result = await this.lenhDieuXeMayService.updateLenhDieuXeMay(params);
+            this.logger.info('Cập nhật lệnh điều xe máy thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật lệnh điều xe máy', { params, error });
+            return createResponse('Có lỗi xảy ra khi cập nhật lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

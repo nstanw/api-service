@@ -52,3 +52,13 @@ export interface BreakfastRegistration {
   tuDongDangKy?: boolean;
   ngoaiTru?: number;
 }
+
+export interface UpdateLenhDieuXeMayInput {
+  Code: string;
+  ViTriBatDau?: string;
+  ViTriHoanThanh?: string;
+  ChiSoDongHoCongToMetBatDau?: number;
+  ChiSoDongHoCongToMetHoanThanh?: number;
+  ThoiGianBatDau?: string;
+  ThoiGianHoanThanh?: string;
+}

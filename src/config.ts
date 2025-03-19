@@ -17,6 +17,9 @@ const CONFIG = {
     },
     XOA_ANT: {
       ACTION: '/api/services/app/TuanAnhAppServices/XoaAnhNghiemThu'
+    },
+    LENH_DIEU_XE_MAY: {
+      UPDATE: '/api/services/app/TuanAnhAppServices/UpdateLenhDieuXeMay'
     }
   }
 };

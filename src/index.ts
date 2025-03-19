@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -23,10 +23,12 @@ class ApiServer {
   private tools: Record<string, Tool>;
   private hoaChatService: HoaChatService;
   private statusService: StatusService;
+  private xoaAnhNghiemThuService: XoaAnhNghiemThuService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
     this.statusService = new StatusService();
+    this.xoaAnhNghiemThuService = new XoaAnhNghiemThuService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -84,6 +86,16 @@ class ApiServer {
             hN_PAC: { type: 'number', description: 'HN PAC' }
           },
           required: ['ngay', 'ca']
+        }
+      },
+      xoa_anh_nghiem_thu: {
+        description: 'Xóa Ảnh nghiệm thu theo yêu cầu',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            resourceId: { type: 'string', description: 'ID của resource cần xóa (UUID)' }
+          },
+          required: ['resourceId']
         }
       }
     };
@@ -207,6 +219,26 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi cập nhật hóa chất', { args, error });
             return createResponse('Có lỗi xảy ra khi cập nhật hóa chất' + { args, error });
+          }
+        }
+
+        case 'xoa_anh_nghiem_thu': {
+          const args = request.params.arguments || {};
+          const params = {
+            ResourceId: String(args.resourceId || '')
+          };
+
+          if (!params.ResourceId) {
+            return createResponse('Thiếu tham số bắt buộc (resourceId)');
+          }
+
+          try {
+            const result = await this.xoaAnhNghiemThuService.xoaAnhNghiemThu(params);
+            this.logger.info('Xóa ảnh nghiệm thu thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi xóa ảnh nghiệm thu', { params, error });
+            return createResponse('Có lỗi xảy ra khi xóa ảnh nghiệm thu' +  JSON.stringify(params) + (error instanceof Error ? error.message : String(error)));
           }
         }
 

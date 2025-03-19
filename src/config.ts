@@ -14,6 +14,9 @@ const CONFIG = {
     },
     HOA_CHAT: {
       UPDATE: '/api/services/app/TuanAnhAppServices/UpdateHoaChatSXN'
+    },
+    XOA_ANT: {
+      ACTION: '/api/services/app/TuanAnhAppServices/XoaAnhNghiemThu'
     }
   }
 };

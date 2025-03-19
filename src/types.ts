@@ -37,6 +37,10 @@ export interface PagedResultDto<T> {
 
 export type AbpPagedResponse<T> = ApiResponse<PagedResultDto<T>>;
 
+export interface XoaAnhNghiemThuInput {
+  ResourceId: string;
+}
+
 export interface BreakfastRegistration {
   maNhanVien: string;
   thoiGian: string;

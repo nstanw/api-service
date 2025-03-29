@@ -62,3 +62,8 @@ export interface UpdateLenhDieuXeMayInput {
   ThoiGianBatDau?: string;
   ThoiGianHoanThanh?: string;
 }
+
+export interface ChuyenNhanVienThiCongGiaoKhoanInput {
+  code: string;
+  nhanVienThiCong: string;
+}

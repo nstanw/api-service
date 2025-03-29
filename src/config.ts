@@ -20,6 +20,9 @@ const CONFIG = {
     },
     LENH_DIEU_XE_MAY: {
       UPDATE: '/api/services/app/TuanAnhAppServices/UpdateLenhDieuXeMay'
+    },
+    TUANANH: {
+      CHUYEN_NHAN_VIEN_THI_CONG: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan'
     }
   }
 };

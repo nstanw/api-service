@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -25,12 +25,14 @@ class ApiServer {
   private statusService: StatusService;
   private xoaAnhNghiemThuService: XoaAnhNghiemThuService;
   private lenhDieuXeMayService: LenhDieuXeMayService;
+  private chuyenNhanVienThiCongGiaoKhoanService: ChuyenNhanVienThiCongGiaoKhoanService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
     this.statusService = new StatusService();
     this.xoaAnhNghiemThuService = new XoaAnhNghiemThuService();
     this.lenhDieuXeMayService = new LenhDieuXeMayService();
+    this.chuyenNhanVienThiCongGiaoKhoanService = new ChuyenNhanVienThiCongGiaoKhoanService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -114,6 +116,23 @@ class ApiServer {
             ThoiGianHoanThanh: { type: 'string', description: 'Thời gian hoàn thành (ISO format)' }
           },
           required: ['Code']
+        }
+      },
+      chuyen_nhan_vien_thi_cong: {
+        description: 'Chuyển nhân viên thi công giao khoán',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            code: { 
+              type: 'string', 
+              description: 'Mã công trình' 
+            },
+            nhanVienThiCong: { 
+              type: 'string', 
+              description: 'Mã nhân viên thi công' 
+            }
+          },
+          required: ['code', 'nhanVienThiCong']
         }
       }
     };
@@ -283,6 +302,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi cập nhật lệnh điều xe máy', { params, error });
             return createResponse('Có lỗi xảy ra khi cập nhật lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'chuyen_nhan_vien_thi_cong': {
+          const args = request.params.arguments || {};
+          const params = {
+            code: String(args.code || ''),
+            nhanVienThiCong: String(args.nhanVienThiCong || '')
+          };
+
+          if (!params.code || !params.nhanVienThiCong) {
+            return createResponse('Thiếu tham số bắt buộc (code, nhanVienThiCong)');
+          }
+
+          try {
+            const result = await this.chuyenNhanVienThiCongGiaoKhoanService.chuyenNhanVienThiCongGiaoKhoan(params);
+            this.logger.info('Chuyển nhân viên thi công thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi chuyển nhân viên thi công', { params, error });
+            return createResponse('Có lỗi xảy ra khi chuyển nhân viên thi công: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

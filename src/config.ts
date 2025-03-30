@@ -19,10 +19,12 @@ const CONFIG = {
       ACTION: '/api/services/app/TuanAnhAppServices/XoaAnhNghiemThu'
     },
     LENH_DIEU_XE_MAY: {
-      UPDATE: '/api/services/app/TuanAnhAppServices/UpdateLenhDieuXeMay'
+      UPDATE: '/api/services/app/TuanAnhAppServices/UpdateLenhDieuXeMay',
+      DELETE: '/api/services/app/TuanAnhAppServices/DeleteLenhDieuXeMay'
     },
     TUANANH: {
-      CHUYEN_NHAN_VIEN_THI_CONG: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan'
+      CHUYEN_NHAN_VIEN_THI_CONG: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan',
+      PHAN_CONG_NHAN_VIEN_KY_THUAT: '/api/services/app/MangCap4/PhanCongNhanVienKyThuat'
     }
   }
 };

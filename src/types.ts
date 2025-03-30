@@ -67,3 +67,12 @@ export interface ChuyenNhanVienThiCongGiaoKhoanInput {
   code: string;
   nhanVienThiCong: string;
 }
+
+export interface PhanCongNhanVienKyThuatInput {
+  maddk: string;
+  maNhanVien: string;
+}
+
+export interface DeleteLenhDieuXeMayInput {
+  Code: string;
+}

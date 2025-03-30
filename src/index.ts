@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -26,6 +26,7 @@ class ApiServer {
   private xoaAnhNghiemThuService: XoaAnhNghiemThuService;
   private lenhDieuXeMayService: LenhDieuXeMayService;
   private chuyenNhanVienThiCongGiaoKhoanService: ChuyenNhanVienThiCongGiaoKhoanService;
+  private phanCongNhanVienKyThuatService: PhanCongNhanVienKyThuatService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -33,6 +34,7 @@ class ApiServer {
     this.xoaAnhNghiemThuService = new XoaAnhNghiemThuService();
     this.lenhDieuXeMayService = new LenhDieuXeMayService();
     this.chuyenNhanVienThiCongGiaoKhoanService = new ChuyenNhanVienThiCongGiaoKhoanService();
+    this.phanCongNhanVienKyThuatService = new PhanCongNhanVienKyThuatService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -133,6 +135,36 @@ class ApiServer {
             }
           },
           required: ['code', 'nhanVienThiCong']
+        }
+      },
+      phan_cong_nhan_vien_ky_thuat: {
+        description: 'Phân công nhân viên kỹ thuật',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maddk: { 
+              type: 'string', 
+              description: 'Mã đăng ký' 
+            },
+            maNhanVien: { 
+              type: 'string', 
+              description: 'Mã nhân viên' 
+            }
+          },
+          required: ['maddk', 'maNhanVien']
+        }
+      },
+      delete_lenh_dieu_xe_may: {
+        description: 'Xóa lệnh điều xe máy',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            Code: {
+              type: 'string',
+              description: 'Mã lệnh điều xe'
+            }
+          },
+          required: ['Code']
         }
       }
     };
@@ -323,6 +355,46 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi chuyển nhân viên thi công', { params, error });
             return createResponse('Có lỗi xảy ra khi chuyển nhân viên thi công: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'phan_cong_nhan_vien_ky_thuat': {
+          const args = request.params.arguments || {};
+          const params = {
+            maddk: String(args.maddk || ''),
+            maNhanVien: String(args.maNhanVien || '')
+          };
+
+          if (!params.maddk || !params.maNhanVien) {
+            return createResponse('Thiếu tham số bắt buộc (maddk, maNhanVien)');
+          }
+          try {
+            const result = await this.phanCongNhanVienKyThuatService.phanCongNhanVienKyThuat(params);
+            this.logger.info('Phân công nhân viên kỹ thuật thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi phân công nhân viên kỹ thuật', { params, error });
+            return createResponse('Có lỗi xảy ra khi phân công nhân viên kỹ thuật: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'delete_lenh_dieu_xe_may': {
+          const args = request.params.arguments || {};
+          const params = {
+            Code: String(args.Code || '')
+          };
+
+          if (!params.Code) {
+            return createResponse('Thiếu tham số bắt buộc (Code)');
+          }
+
+          try {
+            const result = await this.lenhDieuXeMayService.deleteLenhDieuXeMay(params);
+            this.logger.info('Xóa lệnh điều xe máy thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi xóa lệnh điều xe máy', { params, error });
+            return createResponse('Có lỗi xảy ra khi xóa lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

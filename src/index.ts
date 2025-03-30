@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -27,6 +27,7 @@ class ApiServer {
   private lenhDieuXeMayService: LenhDieuXeMayService;
   private chuyenNhanVienThiCongGiaoKhoanService: ChuyenNhanVienThiCongGiaoKhoanService;
   private phanCongNhanVienKyThuatService: PhanCongNhanVienKyThuatService;
+  private moInLaiPhieuXuatKhoService: MoInLaiPhieuXuatKhoService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -35,6 +36,7 @@ class ApiServer {
     this.lenhDieuXeMayService = new LenhDieuXeMayService();
     this.chuyenNhanVienThiCongGiaoKhoanService = new ChuyenNhanVienThiCongGiaoKhoanService();
     this.phanCongNhanVienKyThuatService = new PhanCongNhanVienKyThuatService();
+    this.moInLaiPhieuXuatKhoService = new MoInLaiPhieuXuatKhoService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -165,6 +167,23 @@ class ApiServer {
             }
           },
           required: ['Code']
+        }
+      },
+      mo_in_lai_phieu_xuat_kho_vat_tu: {
+        description: 'Mở in lại phiếu xuất kho vật tư',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            soPhieuXuatKho: {
+              type: 'string',
+              description: 'Số phiếu xuất kho'
+            },
+            nam: {
+              type: 'number',
+              description: 'Năm của phiếu xuất kho'
+            }
+          },
+          required: ['soPhieuXuatKho', 'nam']
         }
       }
     };
@@ -395,6 +414,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi xóa lệnh điều xe máy', { params, error });
             return createResponse('Có lỗi xảy ra khi xóa lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'mo_in_lai_phieu_xuat_kho_vat_tu': {
+          const args = request.params.arguments || {};
+          const params = {
+            soPhieuXuatKho: String(args.soPhieuXuatKho || ''),
+            nam: Number(args.nam || 0)
+          };
+
+          if (!params.soPhieuXuatKho || !params.nam) {
+            return createResponse('Thiếu tham số bắt buộc (soPhieuXuatKho, nam)');
+          }
+
+          try {
+            const result = await this.moInLaiPhieuXuatKhoService.moInLaiPhieuXuatKho(params);
+            this.logger.info('Mở in lại phiếu xuất kho vật tư thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi mở in lại phiếu xuất kho vật tư', { params, error });
+            return createResponse('Có lỗi xảy ra khi mở in lại phiếu xuất kho vật tư: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

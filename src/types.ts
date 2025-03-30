@@ -76,3 +76,8 @@ export interface PhanCongNhanVienKyThuatInput {
 export interface DeleteLenhDieuXeMayInput {
   Code: string;
 }
+
+export interface MoInLaiPhieuXuatKhoVatTuInput {
+  soPhieuXuatKho: string;
+  nam: number;
+}

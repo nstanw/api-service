@@ -81,3 +81,7 @@ export interface MoInLaiPhieuXuatKhoVatTuInput {
   soPhieuXuatKho: string;
   nam: number;
 }
+
+export interface AddNhaSanXuatInput {
+  tenNhaSanXuat: string;
+}

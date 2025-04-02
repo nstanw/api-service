@@ -7,3 +7,4 @@ export * from './lenh-dieu-xe-may.service.js';
 export * from './ChuyenNhanVienThiCongGiaoKhoan.service.js';
 export * from './PhanCongNhanVienKyThuat.service.js';
 export * from './mo-in-lai-phieu-xuat-kho.service.js';
+export * from './add-nha-san-xuat.service.js';

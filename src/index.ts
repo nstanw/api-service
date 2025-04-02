@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -28,6 +28,7 @@ class ApiServer {
   private chuyenNhanVienThiCongGiaoKhoanService: ChuyenNhanVienThiCongGiaoKhoanService;
   private phanCongNhanVienKyThuatService: PhanCongNhanVienKyThuatService;
   private moInLaiPhieuXuatKhoService: MoInLaiPhieuXuatKhoService;
+  private addNhaSanXuatService: AddNhaSanXuatService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -37,6 +38,7 @@ class ApiServer {
     this.chuyenNhanVienThiCongGiaoKhoanService = new ChuyenNhanVienThiCongGiaoKhoanService();
     this.phanCongNhanVienKyThuatService = new PhanCongNhanVienKyThuatService();
     this.moInLaiPhieuXuatKhoService = new MoInLaiPhieuXuatKhoService();
+    this.addNhaSanXuatService = new AddNhaSanXuatService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -184,6 +186,19 @@ class ApiServer {
             }
           },
           required: ['soPhieuXuatKho', 'nam']
+        }
+      },
+      add_nha_san_xuat: {
+        description: 'Thêm nhà sản xuất mới',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            tenNhaSanXuat: {
+              type: 'string',
+              description: 'Tên nhà sản xuất'
+            }
+          },
+          required: ['tenNhaSanXuat']
         }
       }
     };
@@ -435,6 +450,26 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi mở in lại phiếu xuất kho vật tư', { params, error });
             return createResponse('Có lỗi xảy ra khi mở in lại phiếu xuất kho vật tư: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'add_nha_san_xuat': {
+          const args = request.params.arguments || {};
+          const params = {
+            tenNhaSanXuat: String(args.tenNhaSanXuat || '')
+          };
+
+          if (!params.tenNhaSanXuat) {
+            return createResponse('Thiếu tham số bắt buộc (tenNhaSanXuat)');
+          }
+
+          try {
+            const result = await this.addNhaSanXuatService.addNhaSanXuat(params);
+            this.logger.info('Thêm nhà sản xuất thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi thêm nhà sản xuất', { params, error });
+            return createResponse('Có lỗi xảy ra khi thêm nhà sản xuất: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

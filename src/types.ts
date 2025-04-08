@@ -82,6 +82,13 @@ export interface MoInLaiPhieuXuatKhoVatTuInput {
   nam: number;
 }
 
+export interface ThemNhanVienCongViecSXNInput {
+  maNhanVien: string;
+  congViec: string;
+  nhomCaTruc: number;
+  diaDiem: string;
+}
+
 export interface AddNhaSanXuatInput {
   tenNhaSanXuat: string;
 }

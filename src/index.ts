@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -29,6 +29,7 @@ class ApiServer {
   private phanCongNhanVienKyThuatService: PhanCongNhanVienKyThuatService;
   private moInLaiPhieuXuatKhoService: MoInLaiPhieuXuatKhoService;
   private addNhaSanXuatService: AddNhaSanXuatService;
+  private themNhanVienSXNService: ThemNhanVienSXNService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -39,6 +40,7 @@ class ApiServer {
     this.phanCongNhanVienKyThuatService = new PhanCongNhanVienKyThuatService();
     this.moInLaiPhieuXuatKhoService = new MoInLaiPhieuXuatKhoService();
     this.addNhaSanXuatService = new AddNhaSanXuatService();
+    this.themNhanVienSXNService = new ThemNhanVienSXNService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -200,6 +202,31 @@ class ApiServer {
           },
           required: ['tenNhaSanXuat']
         }
+      },
+      them_nhan_vien_sxn: {
+        description: 'Thêm nhân viên công việc SXN',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maNhanVien: {
+              type: 'string',
+              description: 'Mã nhân viên'
+            },
+            congViec: {
+              type: 'string',
+              description: 'Công việc'  
+            },
+            nhomCaTruc: {
+              type: 'number',
+              description: 'Nhóm ca trực'
+            },
+            diaDiem: {
+              type: 'string',
+              description: 'Địa điểm'
+            }
+          },
+          required: ['maNhanVien', 'congViec', 'nhomCaTruc', 'diaDiem']
+        }
       }
     };
 
@@ -358,7 +385,7 @@ class ApiServer {
             };
 
           // if (!params.Code) {
-          //   return createResponse('Thiếu tham số bắt buộc (code)');
+          //   return createResponse('Thiếu tham số bắt buộc (Code)');
           // }
 
           try {
@@ -470,6 +497,29 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi thêm nhà sản xuất', { params, error });
             return createResponse('Có lỗi xảy ra khi thêm nhà sản xuất: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'them_nhan_vien_sxn': {
+          const args = request.params.arguments || {};
+          const params = {
+            maNhanVien: String(args.maNhanVien || ''),
+            congViec: String(args.congViec || ''),
+            nhomCaTruc: Number(args.nhomCaTruc || 0),
+            diaDiem: String(args.diaDiem || '')
+          };
+
+          if (!params.maNhanVien || !params.congViec || !params.nhomCaTruc || !params.diaDiem) {
+            return createResponse('Thiếu tham số bắt buộc (maNhanVien, congViec, nhomCaTruc, diaDiem)');
+          }
+
+          try {
+            const result = await this.themNhanVienSXNService.themNhanVienSXN(params);
+            this.logger.info('Thêm nhân viên công việc SXN thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi thêm nhân viên công việc SXN', { params, error });
+            return createResponse('Có lỗi xảy ra khi thêm nhân viên công việc SXN: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

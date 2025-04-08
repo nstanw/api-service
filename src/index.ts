@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -29,6 +29,7 @@ class ApiServer {
   private phanCongNhanVienKyThuatService: PhanCongNhanVienKyThuatService;
   private moInLaiPhieuXuatKhoService: MoInLaiPhieuXuatKhoService;
   private addNhaSanXuatService: AddNhaSanXuatService;
+  private updateTTHSMangCap4Service: UpdateTTHSMangCap4Service;
   private themNhanVienSXNService: ThemNhanVienSXNService;
 
   constructor() {
@@ -41,6 +42,7 @@ class ApiServer {
     this.moInLaiPhieuXuatKhoService = new MoInLaiPhieuXuatKhoService();
     this.addNhaSanXuatService = new AddNhaSanXuatService();
     this.themNhanVienSXNService = new ThemNhanVienSXNService();
+    this.updateTTHSMangCap4Service = new UpdateTTHSMangCap4Service();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -520,6 +522,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi thêm nhân viên công việc SXN', { params, error });
             return createResponse('Có lỗi xảy ra khi thêm nhân viên công việc SXN: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'update_tths_mang_cap4': {
+          const args = request.params.arguments || {};
+          const params = {
+            maddk: String(args.maddk || ''),
+            newTTHS: String(args.newTTHS || '')
+          };
+
+          if (!params.maddk || !params.newTTHS) {
+            return createResponse('Thiếu tham số bắt buộc (maddk, newTTHS)');
+          }
+
+          try {
+            const result = await this.updateTTHSMangCap4Service.updateTTHS(params);
+            this.logger.info('Cập nhật TTHS thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật TTHS', { params, error });
+            return createResponse('Có lỗi xảy ra khi cập nhật TTHS: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

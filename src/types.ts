@@ -11,6 +11,11 @@ export interface UpdateHoaChatSXNInput {
   hN_Clo?: number;
   hN_PAC?: number;
 }
+
+export interface UpdateTTHSInput {
+  maddk: string;
+  newTTHS: string;
+}
 export interface Employee {
   id: string;
   name: string;

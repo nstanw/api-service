@@ -26,6 +26,7 @@ const CONFIG = {
       CHUYEN_NHAN_VIEN_THI_CONG: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan',
       PHAN_CONG_NHAN_VIEN_KY_THUAT: '/api/services/app/MangCap4/PhanCongNhanVienKyThuat',
       MO_IN_LAI_PHIEU_XUAT_KHO: '/api/services/app/TuanAnhAppServices/MoInLaiPhieuXuatKhoVatTu',
+      UPDATE_TTHS_MANG_CAP4: '/api/services/app/TuanAnhAppServices/UpdateTTHSMangCap4',
       THEM_NHAN_VIEN_SXN: '/api/services/app/TuanAnhAppServices/ThemNhanVienCongViecSXN'
     },
     NHA_SAN_XUAT: {

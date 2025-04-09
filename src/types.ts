@@ -97,3 +97,8 @@ export interface ThemNhanVienCongViecSXNInput {
 export interface AddNhaSanXuatInput {
   tenNhaSanXuat: string;
 }
+
+export interface ChuyenNhanVienKyThuatGiaoKhoanInput {
+  code: string;
+  maNhanVienKyThuat: string;
+}

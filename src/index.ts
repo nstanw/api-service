@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -31,6 +31,7 @@ class ApiServer {
   private addNhaSanXuatService: AddNhaSanXuatService;
   private updateTTHSMangCap4Service: UpdateTTHSMangCap4Service;
   private themNhanVienSXNService: ThemNhanVienSXNService;
+  private chuyenNhanVienKyThuatGiaoKhoanService: ChuyenNhanVienKyThuatGiaoKhoanService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -43,6 +44,7 @@ class ApiServer {
     this.addNhaSanXuatService = new AddNhaSanXuatService();
     this.themNhanVienSXNService = new ThemNhanVienSXNService();
     this.updateTTHSMangCap4Service = new UpdateTTHSMangCap4Service();
+    this.chuyenNhanVienKyThuatGiaoKhoanService = new ChuyenNhanVienKyThuatGiaoKhoanService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -228,6 +230,23 @@ class ApiServer {
             }
           },
           required: ['maNhanVien', 'congViec', 'nhomCaTruc', 'diaDiem']
+        }
+      },
+      chuyen_nhan_vien_ky_thuat_giao_khoan: {
+        description: 'Chuyển nhân viên kỹ thuật giao khoán',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            code: { 
+              type: 'string', 
+              description: 'Mã công trình' 
+            },
+            maNhanVienKyThuat: { 
+              type: 'string', 
+              description: 'Mã nhân viên kỹ thuật' 
+            }
+          },
+          required: ['code', 'maNhanVienKyThuat']
         }
       }
     };
@@ -543,6 +562,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi cập nhật TTHS', { params, error });
             return createResponse('Có lỗi xảy ra khi cập nhật TTHS: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'chuyen_nhan_vien_ky_thuat_giao_khoan': {
+          const args = request.params.arguments || {};
+          const params = {
+            code: String(args.code || ''),
+            maNhanVienKyThuat: String(args.maNhanVienKyThuat || '')
+          };
+
+          if (!params.code || !params.maNhanVienKyThuat) {
+            return createResponse('Thiếu tham số bắt buộc (code, maNhanVienKyThuat)');
+          }
+
+          try {
+            const result = await this.chuyenNhanVienKyThuatGiaoKhoanService.chuyenNhanVienKyThuatGiaoKhoan(params);
+            this.logger.info('Chuyển nhân viên kỹ thuật giao khoán thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi chuyển nhân viên kỹ thuật giao khoán', { params, error });
+            return createResponse('Có lỗi xảy ra khi chuyển nhân viên kỹ thuật giao khoán: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

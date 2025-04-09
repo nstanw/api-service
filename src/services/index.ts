@@ -10,3 +10,4 @@ export * from './mo-in-lai-phieu-xuat-kho.service.js';
 export * from './update-tths-mang-cap4.service.js';
 export * from './them-nhan-vien-sxn.service.js';
 export * from './add-nha-san-xuat.service.js';
+export * from './ChuyenNhanVienKyThuatGiaoKhoan.service.js';

@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_BASE_URL: 'https://localhost:44311',
+  API_BASE_URL: 'http://localhost:44311/',
   LOG_PATH: './logs',
   TOOLS: {
     STATUS: {
@@ -28,7 +28,8 @@ const CONFIG = {
       MO_IN_LAI_PHIEU_XUAT_KHO: '/api/services/app/TuanAnhAppServices/MoInLaiPhieuXuatKhoVatTu',
       UPDATE_TTHS_MANG_CAP4: '/api/services/app/TuanAnhAppServices/UpdateTTHSMangCap4',
       THEM_NHAN_VIEN_SXN: '/api/services/app/TuanAnhAppServices/ThemNhanVienCongViecSXN',
-      CHUYEN_NHAN_VIEN_KY_THUAT_GIAO_KHOAN: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienKyThuatGiaoKhoan'
+      CHUYEN_NHAN_VIEN_KY_THUAT_GIAO_KHOAN: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienKyThuatGiaoKhoan',
+      GET_LENH_DIEU_XE_MAY: '/api/services/app/TuanAnhAppServices/GetLenhDieuXeMay'
     },
     NHA_SAN_XUAT: {
       ADD: '/api/services/app/NhaSanXuat/AddNhaSanXuat'

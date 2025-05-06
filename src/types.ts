@@ -102,3 +102,7 @@ export interface ChuyenNhanVienKyThuatGiaoKhoanInput {
   code: string;
   maNhanVienKyThuat: string;
 }
+
+export interface GetLenhDieuXeMayInput {
+  Code: string;
+}

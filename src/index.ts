@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -32,6 +32,7 @@ class ApiServer {
   private updateTTHSMangCap4Service: UpdateTTHSMangCap4Service;
   private themNhanVienSXNService: ThemNhanVienSXNService;
   private chuyenNhanVienKyThuatGiaoKhoanService: ChuyenNhanVienKyThuatGiaoKhoanService;
+  private getLenhDieuXeMayService: GetLenhDieuXeMayService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -45,6 +46,7 @@ class ApiServer {
     this.themNhanVienSXNService = new ThemNhanVienSXNService();
     this.updateTTHSMangCap4Service = new UpdateTTHSMangCap4Service();
     this.chuyenNhanVienKyThuatGiaoKhoanService = new ChuyenNhanVienKyThuatGiaoKhoanService();
+    this.getLenhDieuXeMayService = new GetLenhDieuXeMayService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -247,6 +249,19 @@ class ApiServer {
             }
           },
           required: ['code', 'maNhanVienKyThuat']
+        }
+      },
+      get_lenh_dieu_xe_may: {
+        description: 'Lấy thông tin lệnh điều xe máy',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            Code: {
+              type: 'string',
+              description: 'Mã lệnh điều xe'
+            }
+          },
+          required: ['Code']
         }
       }
     };
@@ -583,6 +598,26 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi chuyển nhân viên kỹ thuật giao khoán', { params, error });
             return createResponse('Có lỗi xảy ra khi chuyển nhân viên kỹ thuật giao khoán: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'get_lenh_dieu_xe_may': {
+          const args = request.params.arguments || {};
+          const params = {
+            Code: String(args.Code || '')
+          };
+
+          if (!params.Code) {
+            return createResponse('Thiếu tham số bắt buộc (Code)');
+          }
+
+          try {
+            const result = await this.getLenhDieuXeMayService.getLenhDieuXeMay(params);
+            this.logger.info('Lấy thông tin lệnh điều xe máy thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi lấy thông tin lệnh điều xe máy', { params, error });
+            return createResponse('Có lỗi xảy ra khi lấy thông tin lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

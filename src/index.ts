@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -33,6 +33,7 @@ class ApiServer {
   private themNhanVienSXNService: ThemNhanVienSXNService;
   private chuyenNhanVienKyThuatGiaoKhoanService: ChuyenNhanVienKyThuatGiaoKhoanService;
   private getLenhDieuXeMayService: GetLenhDieuXeMayService;
+  private phanCongNhanVienThiCongService: PhanCongNhanVienThiCongService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -47,6 +48,7 @@ class ApiServer {
     this.updateTTHSMangCap4Service = new UpdateTTHSMangCap4Service();
     this.chuyenNhanVienKyThuatGiaoKhoanService = new ChuyenNhanVienKyThuatGiaoKhoanService();
     this.getLenhDieuXeMayService = new GetLenhDieuXeMayService();
+    this.phanCongNhanVienThiCongService = new PhanCongNhanVienThiCongService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -262,6 +264,23 @@ class ApiServer {
             }
           },
           required: ['Code']
+        }
+      },
+      phan_cong_nhan_vien_thi_cong: {
+        description: 'Phân công nhân viên thi công',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maddk: {
+              type: 'string',
+              description: 'Mã đăng ký'
+            },
+            maNhanVien: {
+              type: 'string',
+              description: 'Mã nhân viên'
+            }
+          },
+          required: ['maddk', 'maNhanVien']
         }
       }
     };
@@ -618,6 +637,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi lấy thông tin lệnh điều xe máy', { params, error });
             return createResponse('Có lỗi xảy ra khi lấy thông tin lệnh điều xe máy: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
+
+        case 'phan_cong_nhan_vien_thi_cong': {
+          const args = request.params.arguments || {};
+          const params = {
+            maddk: String(args.maddk || ''),
+            maNhanVien: String(args.maNhanVien || '')
+          };
+
+          if (!params.maddk || !params.maNhanVien) {
+            return createResponse('Thiếu tham số bắt buộc (maddk, maNhanVien)');
+          }
+          
+          try {
+            const result = await this.phanCongNhanVienThiCongService.phanCongNhanVienThiCong(params);
+            this.logger.info('Phân công nhân viên thi công thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi phân công nhân viên thi công', { params, error });
+            return createResponse('Có lỗi xảy ra khi phân công nhân viên thi công: ' + (error instanceof Error ? error : String(error)));
           }
         }
 

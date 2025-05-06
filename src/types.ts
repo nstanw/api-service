@@ -106,3 +106,8 @@ export interface ChuyenNhanVienKyThuatGiaoKhoanInput {
 export interface GetLenhDieuXeMayInput {
   Code: string;
 }
+
+export interface PhanCongNhanVienThiCongInput {
+  maddk: string;
+  maNhanVien: string;
+}

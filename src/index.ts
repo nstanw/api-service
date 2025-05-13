@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, UpdateTonKhoSoSachService, UpdateTonKhoService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -34,6 +34,8 @@ class ApiServer {
   private chuyenNhanVienKyThuatGiaoKhoanService: ChuyenNhanVienKyThuatGiaoKhoanService;
   private getLenhDieuXeMayService: GetLenhDieuXeMayService;
   private phanCongNhanVienThiCongService: PhanCongNhanVienThiCongService;
+  private updateTonKhoSoSachService: UpdateTonKhoSoSachService;
+  private updateTonKhoService: UpdateTonKhoService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -49,6 +51,8 @@ class ApiServer {
     this.chuyenNhanVienKyThuatGiaoKhoanService = new ChuyenNhanVienKyThuatGiaoKhoanService();
     this.getLenhDieuXeMayService = new GetLenhDieuXeMayService();
     this.phanCongNhanVienThiCongService = new PhanCongNhanVienThiCongService();
+    this.updateTonKhoSoSachService = new UpdateTonKhoSoSachService();
+    this.updateTonKhoService = new UpdateTonKhoService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -281,6 +285,31 @@ class ApiServer {
             }
           },
           required: ['maddk', 'maNhanVien']
+        }
+      },
+      update_ton_kho_so_sach: {
+        description: 'Cập nhật tồn kho sổ sách',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maKhoVatTu: { type: 'number', description: 'Mã kho vật tư' },
+            maVatTuHangHoa: { type: 'number', description: 'Mã vật tư hàng hóa' },
+            maNhaSanXuat: { type: 'number', description: 'Mã nhà sản xuất' },
+            tonKhoSoSach: { type: 'number', description: 'Tồn kho sổ sách' }
+          },
+          required: ['maKhoVatTu','maVatTuHangHoa','maNhaSanXuat','tonKhoSoSach']
+        }
+      },
+      update_ton_kho: {
+        description: 'Cập nhật tồn kho',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maVatTuHangHoa: { type: 'number', description: 'Mã vật tư hàng hóa' },
+            maNhaSanXuat: { type: 'number', description: 'Mã nhà sản xuất' },
+            maKhoVatTu: { type: 'number', description: 'Mã kho vật tư' }
+          },
+          required: ['maVatTuHangHoa', 'maNhaSanXuat', 'maKhoVatTu']
         }
       }
     };
@@ -659,6 +688,51 @@ class ApiServer {
             this.logger.error('Lỗi khi phân công nhân viên thi công', { params, error });
             return createResponse('Có lỗi xảy ra khi phân công nhân viên thi công: ' + (error instanceof Error ? error : String(error)));
           }
+        }
+
+        case 'update_ton_kho': {
+          const args = request.params.arguments || {};
+          const params = {
+            maVatTuHangHoa: Number(args.maVatTuHangHoa),
+            maNhaSanXuat: Number(args.maNhaSanXuat),
+            maKhoVatTu: Number(args.maKhoVatTu)
+          };
+
+          if (!params.maVatTuHangHoa || !params.maNhaSanXuat || !params.maKhoVatTu) {
+            return createResponse('Thiếu tham số bắt buộc (maVatTuHangHoa, maNhaSanXuat, maKhoVatTu)');
+          }
+
+          try {
+            const result = await this.updateTonKhoService.updateTonKho(params);
+            this.logger.info('Cập nhật tồn kho thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật tồn kho', { params, error });
+            return createResponse('Lỗi khi cập nhật tồn kho: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'update_ton_kho_so_sach': {
+        const args = request.params.arguments || {};
+        const params = {
+          maKhoVatTu: Number(args.maKhoVatTu),
+          maVatTuHangHoa: Number(args.maVatTuHangHoa),
+          maNhaSanXuat: Number(args.maNhaSanXuat),
+          tonKhoSoSach: Number(args.tonKhoSoSach)
+        };
+
+        if (!params.maKhoVatTu || !params.maVatTuHangHoa || !params.maNhaSanXuat || !params.tonKhoSoSach) {
+          return createResponse('Thiếu tham số bắt buộc (maKhoVatTu, maVatTuHangHoa, maNhaSanXuat, tonKhoSoSach)');
+        }
+
+        try {
+          const result = await this.updateTonKhoSoSachService.updateTonKhoSoSach(params);
+          this.logger.info('Cập nhật tồn kho sổ sách thành công', { params, result });
+          return createResponse(JSON.stringify(result, null, 2));
+        } catch (error) {
+          this.logger.error('Lỗi khi cập nhật tồn kho sổ sách', { params, error });
+          return createResponse('Lỗi khi cập nhật tồn kho sổ sách: ' + (error instanceof Error ? error.message : String(error)));
+        }
         }
 
         default:

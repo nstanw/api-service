@@ -13,3 +13,5 @@ export * from './add-nha-san-xuat.service.js';
 export * from './ChuyenNhanVienKyThuatGiaoKhoan.service.js';
 export * from './get-lenh-dieu-xe-may.service.js';
 export * from './PhanCongNhanVienThiCong.service.js';
+export * from './update-ton-kho-so-sach.service.js';
+export * from './update-ton-kho.service.js';

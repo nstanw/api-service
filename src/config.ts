@@ -34,6 +34,12 @@ const CONFIG = {
     },
     NHA_SAN_XUAT: {
       ADD: '/api/services/app/NhaSanXuat/AddNhaSanXuat'
+    },
+    TON_KHO_HIEN_TAI: {
+      UPDATE_TON_KHO_SO_SACH: '/api/services/app/TonKhoHienTai/UpdateTonKhoSoSach'
+    },
+    TON_KHO: {
+      UPDATE: '/api/services/app/TonKho/UpdateTonKho'
     }
   }
 };

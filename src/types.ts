@@ -111,3 +111,16 @@ export interface PhanCongNhanVienThiCongInput {
   maddk: string;
   maNhanVien: string;
 }
+
+export interface UpdateTonKhoInput {
+  maVatTuHangHoa: number;
+  maNhaSanXuat: number;
+  maKhoVatTu: number;
+}
+
+export interface UpdateTonKhoSoSachInput {
+  maKhoVatTu: number;
+  maVatTuHangHoa: number;
+  maNhaSanXuat: number;
+  tonKhoSoSach: number;
+}

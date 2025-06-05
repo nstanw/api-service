@@ -1,6 +1,12 @@
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
 const CONFIG = {
-  API_BASE_URL: 'http://localhost:44311/',
-  LOG_PATH: './logs',
+  API_BASE_URL: process.env.API_BASE_URL || 'http://118.70.151.182:1223/',
+  LOG_PATH: process.env.LOG_PATH || './logs',
+  NODE_ENV: process.env.NODE_ENV || 'development',
   TOOLS: {
     STATUS: {
       CHECK: '/api/services/app/Session/GetCurrentLoginInformations'

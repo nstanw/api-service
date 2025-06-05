@@ -124,3 +124,22 @@ export interface UpdateTonKhoSoSachInput {
   maNhaSanXuat: number;
   tonKhoSoSach: number;
 }
+
+export interface PhanCongNhanVienThiCongListInput {
+  maNhanVien: string;      // Query parameter
+  danhSachMa: string[];    // Request body array
+}
+
+export interface ChuyenHoSoMienPhiTramNamDanInput {
+  danhSachMa: string[];    // Request body array
+}
+
+export interface GetAllKhaiBaoRaNgoaiInput {
+  limit?: number;
+  start?: number;
+  filter?: string;
+  q?: string;
+  sort?: string;
+  order?: string;
+  after?: string;
+}

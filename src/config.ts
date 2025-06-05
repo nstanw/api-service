@@ -30,7 +30,9 @@ const CONFIG = {
       THEM_NHAN_VIEN_SXN: '/api/services/app/TuanAnhAppServices/ThemNhanVienCongViecSXN',
       CHUYEN_NHAN_VIEN_KY_THUAT_GIAO_KHOAN: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienKyThuatGiaoKhoan',
       GET_LENH_DIEU_XE_MAY: '/api/services/app/TuanAnhAppServices/GetLenhDieuXeMay',
-      PHAN_CONG_NHAN_VIEN_THI_CONG: '/api/services/app/MangCap4/PhanCongNhanVienThiCong'
+      PHAN_CONG_NHAN_VIEN_THI_CONG: '/api/services/app/MangCap4/PhanCongNhanVienThiCong',
+      PHAN_CONG_NHAN_VIEN_THI_CONG_LIST: '/api/services/app/TuanAnhAppServices/PhanCongNhanVienThiCongList',
+      CHUYEN_HO_SO_MIEN_PHI_TRAM_NAM_DAN: '/api/services/app/QuyetToanMangCap4/ChuyenHoSoMienPhiTramNamDan'
     },
     NHA_SAN_XUAT: {
       ADD: '/api/services/app/NhaSanXuat/AddNhaSanXuat'
@@ -40,6 +42,9 @@ const CONFIG = {
     },
     TON_KHO: {
       UPDATE: '/api/services/app/TonKho/UpdateTonKho'
+    },
+    KHAI_BAO_RA_NGOAI: {
+      GET_ALL: '/api/services/app/KhaiBaoRaNgoai/GetAllViewKhaiBaoRaNgoais'
     }
   }
 };

@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, UpdateTonKhoSoSachService, UpdateTonKhoService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -34,8 +34,11 @@ class ApiServer {
   private chuyenNhanVienKyThuatGiaoKhoanService: ChuyenNhanVienKyThuatGiaoKhoanService;
   private getLenhDieuXeMayService: GetLenhDieuXeMayService;
   private phanCongNhanVienThiCongService: PhanCongNhanVienThiCongService;
+  private phanCongNhanVienThiCongListService: PhanCongNhanVienThiCongListService;
+  private chuyenHoSoMienPhiTramNamDanService: ChuyenHoSoMienPhiTramNamDanService;
   private updateTonKhoSoSachService: UpdateTonKhoSoSachService;
   private updateTonKhoService: UpdateTonKhoService;
+  private getAllKhaiBaoRaNgoaiService: GetAllKhaiBaoRaNgoaiService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -51,8 +54,11 @@ class ApiServer {
     this.chuyenNhanVienKyThuatGiaoKhoanService = new ChuyenNhanVienKyThuatGiaoKhoanService();
     this.getLenhDieuXeMayService = new GetLenhDieuXeMayService();
     this.phanCongNhanVienThiCongService = new PhanCongNhanVienThiCongService();
+    this.phanCongNhanVienThiCongListService = new PhanCongNhanVienThiCongListService();
+    this.chuyenHoSoMienPhiTramNamDanService = new ChuyenHoSoMienPhiTramNamDanService();
     this.updateTonKhoSoSachService = new UpdateTonKhoSoSachService();
     this.updateTonKhoService = new UpdateTonKhoService();
+    this.getAllKhaiBaoRaNgoaiService = new GetAllKhaiBaoRaNgoaiService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -310,6 +316,51 @@ class ApiServer {
             maKhoVatTu: { type: 'number', description: 'Mã kho vật tư' }
           },
           required: ['maVatTuHangHoa', 'maNhaSanXuat', 'maKhoVatTu']
+        }
+      },
+      phan_cong_nhan_vien_thi_cong_list: {
+        description: 'Phân công nhân viên thi công theo danh sách',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maNhanVien: { type: 'string', description: 'Mã nhân viên' },
+            danhSachMa: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Danh sách mã cần phân công'
+            }
+          },
+          required: ['maNhanVien', 'danhSachMa']
+        }
+      },
+      chuyen_ho_so_mien_phi_tram_nam_dan: {
+        description: 'Chuyển hồ sơ miễn phí trạm nâm dan',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            danhSachMa: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Danh sách mã hồ sơ cần chuyển'
+            }
+          },
+          required: ['danhSachMa']
+        }
+      },
+      get_all_khai_bao_ra_ngoai: {
+        description: 'Lấy danh sách tất cả khai báo ra ngoài',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Số lượng bản ghi tối đa' },
+            start: { type: 'number', description: 'Vị trí bắt đầu' },
+            filter: { type: 'string', description: 'Bộ lọc tìm kiếm' },
+            q: { type: 'string', description: 'Từ khóa tìm kiếm' },
+            sort: { type: 'string', description: 'Trường sắp xếp' },
+            order: { type: 'string', description: 'Thứ tự sắp xếp (asc/desc)' },
+            after: { type: 'string', description: 'Lấy dữ liệu sau marker này' }
+          },
+          required: []
         }
       }
     };
@@ -733,6 +784,69 @@ class ApiServer {
           this.logger.error('Lỗi khi cập nhật tồn kho sổ sách', { params, error });
           return createResponse('Lỗi khi cập nhật tồn kho sổ sách: ' + (error instanceof Error ? error.message : String(error)));
         }
+        }
+
+        case 'phan_cong_nhan_vien_thi_cong_list': {
+          const args = request.params.arguments || {};
+          const params = {
+            maNhanVien: String(args.maNhanVien || ''),
+            danhSachMa: Array.isArray(args.danhSachMa) ? args.danhSachMa : []
+          };
+
+          if (!params.maNhanVien || !params.danhSachMa.length) {
+            return createResponse('Thiếu tham số bắt buộc (maNhanVien, danhSachMa)');
+          }
+
+          try {
+            const result = await this.phanCongNhanVienThiCongListService.phanCongNhanVienThiCongList(params);
+            this.logger.info('Phân công nhân viên thi công list thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi phân công nhân viên thi công list', { params, error });
+            return createResponse('Lỗi khi phân công nhân viên thi công list: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'chuyen_ho_so_mien_phi_tram_nam_dan': {
+          const args = request.params.arguments || {};
+          const params = {
+            danhSachMa: Array.isArray(args.danhSachMa) ? args.danhSachMa : []
+          };
+
+          if (!params.danhSachMa.length) {
+            return createResponse('Thiếu tham số bắt buộc (danhSachMa)');
+          }
+
+          try {
+            const result = await this.chuyenHoSoMienPhiTramNamDanService.chuyenHoSoMienPhiTramNamDan(params);
+            this.logger.info('Chuyển hồ sơ miễn phí trạm nâm dan thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi chuyển hồ sơ miễn phí trạm nâm dan', { params, error });
+            return createResponse('Lỗi khi chuyển hồ sơ miễn phí trạm nâm dan: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'get_all_khai_bao_ra_ngoai': {
+          const args = request.params.arguments || {};
+          const params = {
+            limit: args.limit !== undefined ? Number(args.limit) : undefined,
+            start: args.start !== undefined ? Number(args.start) : undefined,
+            filter: args.filter ? String(args.filter) : undefined,
+            q: args.q ? String(args.q) : undefined,
+            sort: args.sort ? String(args.sort) : undefined,
+            order: args.order ? String(args.order) : undefined,
+            after: args.after ? String(args.after) : undefined
+          };
+
+          try {
+            const result = await this.getAllKhaiBaoRaNgoaiService.getAllKhaiBaoRaNgoai(params);
+            this.logger.info('Lấy danh sách khai báo ra ngoài thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi lấy danh sách khai báo ra ngoài', { params, error });
+            return createResponse('Lỗi khi lấy danh sách khai báo ra ngoài: ' + (error instanceof Error ? error.message : String(error)));
+          }
         }
 
         default:

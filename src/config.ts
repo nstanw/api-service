@@ -5,7 +5,6 @@ dotenv.config();
 
 const CONFIG = {
   API_BASE_URL: process.env.API_BASE_URL || 'https://localhost:44311/',
-  LOG_PATH: process.env.LOG_PATH || './logs',
   NODE_ENV: process.env.NODE_ENV || 'development',
   TOOLS: {
     STATUS: {

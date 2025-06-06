@@ -2,69 +2,121 @@
 Hướng dẫn các bước thêm một tool mới vào MCP server, bao gồm cách cập nhật các file cần thiết.
 
 ## Các file cần sửa đổi
-1. Tạo file service mới trong `src/services/`: 
-   - Đặt tên theo format: `TenService.service.ts`
-   - Implement các phương thức xử lý logic
 
-2. Cập nhật `src/types.ts`:
+1. Cập nhật `src/types.ts`:
    - Thêm interface cho input parameters
    ```typescript
-   export interface TenToolInput {
+   export interface NewToolInput {
      param1: string;
      param2: string;
    }
    ```
 
-3. Cập nhật `src/config.ts`:
+2. Cập nhật `src/config.ts`:
    - Thêm endpoint mới vào CONFIG.TOOLS
    ```typescript
    TOOLS: {
      TUANANH: {
-       TEN_TOOL: '/api/services/app/Controller/Action'
+       NEW_TOOL: '/api/services/app/Controller/Action'
      }
    }
    ```
 
-4. Cập nhật `src/services/index.ts`:
-   - Export service mới
+3. Cập nhật `src/services/domain.service.ts`:
+   - Thêm phương thức mới vào service tương ứng với domain của tool
+   - Nếu chưa có service phù hợp, tạo service mới
    ```typescript
-   export * from './ten-tool.service.js';
+   export class DomainService {
+     async newTool(params: NewToolInput) {
+       const response = await ApiClient.post(CONFIG.TOOLS.TUANANH.NEW_TOOL, params);
+       return response.result;
+     }
+   }
    ```
 
-5. Cập nhật `src/index.ts`:
-   - Import service mới
-   - Khai báo biến private
-   - Khởi tạo trong constructor
-   - Thêm tool definition
-   - Thêm case xử lý
+4. Cập nhật `src/handlers/index.ts`:
+   - Thêm handler mới vào object handlers tương ứng
+   ```typescript
+   export const domainHandlers = {
+     // ...các handlers khác
+     
+     newTool: (args: any) => {
+       const params = {
+         param1: String(args.param1 || ''),
+         param2: String(args.param2 || '')
+       };
+       return handleApiCall(
+         () => domainService.newTool(params),
+         params,
+         'Có lỗi xảy ra khi thực hiện tool mới'
+       );
+     }
+   };
+   ```
 
-## Quy tắc thêm case mới trong index.ts
-- Thêm import cho service mới ở đầu file
-- Khai báo biến private trong class `ApiServer`
-- Khởi tạo service trong constructor
-- Thêm định nghĩa tool vào object `this.tools`
-- Thêm case xử lý trong switch statement
-- Log đầy đủ thông tin thành công/thất bại
+5. Cập nhật `src/tools.ts`:
+   - Thêm định nghĩa tool mới
+   ```typescript
+   export const tools: Record<string, Tool> = {
+     // ...các tools khác
+     
+     new_tool: {
+       description: 'Mô tả chức năng của tool mới',
+       inputSchema: {
+         type: 'object',
+         properties: {
+           param1: { type: 'string', description: 'Mô tả tham số 1' },
+           param2: { type: 'string', description: 'Mô tả tham số 2' }
+         },
+         required: ['param1', 'param2']
+       }
+     }
+   };
+   ```
 
-## Ví dụ cấu trúc case
+6. Cập nhật `src/index.ts`:
+   - Thêm case mới vào switch statement
+   ```typescript
+   switch (request.params.name) {
+     // ...các case khác
+     
+     case 'new_tool':
+       return domainHandlers.newTool(args);
+   }
+   ```
+
+## Ví dụ cấu trúc handler
 ```typescript
-case 'ten_tool_moi': {
-  const args = request.params.arguments || {};
+newTool: (args: any) => {
   const params = {
-    thamSo1: String(args.thamSo1 || ''),
-    thamSo2: Number(args.thamSo2 || 0)
+    param1: String(args.param1 || ''),
+    param2: String(args.param2 || '')
   };
-
-  if (!params.thamSo1 || !params.thamSo2) {
-    return createResponse('Thiếu tham số bắt buộc (thamSo1, thamSo2)');
-  }
-
-  try {
-    const result = await this.tenServiceMoi.phuongThucMoi(params);
-    this.logger.info('Thực hiện tool mới thành công', { params, result });
-    return createResponse(JSON.stringify(result, null, 2));
-  } catch (error) {
-    this.logger.error('Lỗi khi thực hiện tool mới', { params, error });
-    return createResponse('Có lỗi xảy ra khi thực hiện tool mới: ' + (error instanceof Error ? error : String(error)));
-  }
+  
+  return handleApiCall(
+    () => domainService.newTool(params),
+    params, // các tham số bắt buộc cần kiểm tra
+    'Thông báo lỗi khi thất bại'
+  );
 }
+```
+
+## Quy tắc đặt tên
+- Tên tool: `new_tool` (snake_case)
+- Tên service: `DomainService` (PascalCase)
+- Tên file service: `domain.service.ts` (kebab-case)
+- Tên method: `newTool` (camelCase)
+- Tên interface: `NewToolInput` (PascalCase)
+- Tên constant: `NEW_TOOL` (SCREAMING_SNAKE_CASE)
+
+## Cấu trúc thư mục
+```
+src/
+├── handlers/            # Logic xử lý các tool
+│   └── index.ts        # Các handlers được nhóm theo domain
+├── services/           # Services theo domain
+│   └── domain.service.ts
+├── config.ts          # Cấu hình API endpoints
+├── tools.ts           # Tool definitions
+├── types.ts           # Type definitions
+└── index.ts           # Entry point

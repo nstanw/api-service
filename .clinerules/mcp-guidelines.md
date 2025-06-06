@@ -32,7 +32,8 @@ Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tậ
 
 ## Xử lý nhân sự
 - Khi tìm kiếm thông tin nhân viên:
-  - Sử dụng API search_employee để xác minh thông tin
+  - Sử dụng API search_employee với tham số q để tìm kiếm theo tên hoặc mã nhân viên
+  - Ví dụ: search_employee(q: "Manh") để tìm nhân viên có tên hoặc mã chứa "Manh"
   - Lưu ý xác nhận đúng mã nhân viên trước khi thực hiện thao tác
   - Kiểm tra kết quả sau mỗi thao tác liên quan đến nhân viên
 

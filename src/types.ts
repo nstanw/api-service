@@ -143,3 +143,9 @@ export interface GetAllKhaiBaoRaNgoaiInput {
   order?: string;
   after?: string;
 }
+
+export interface UpdateKhaiBaoRaNgoaiInput {
+  khaiBaoID: number;
+  tuNgay: string;
+  denNgay: string;
+}

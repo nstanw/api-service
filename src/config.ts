@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const CONFIG = {
-  API_BASE_URL: process.env.API_BASE_URL || 'http://118.70.151.182:1223/',
+  API_BASE_URL: process.env.API_BASE_URL || 'https://localhost:44311/',
   LOG_PATH: process.env.LOG_PATH || './logs',
   NODE_ENV: process.env.NODE_ENV || 'development',
   TOOLS: {
@@ -50,7 +50,8 @@ const CONFIG = {
       UPDATE: '/api/services/app/TonKho/UpdateTonKho'
     },
     KHAI_BAO_RA_NGOAI: {
-      GET_ALL: '/api/services/app/KhaiBaoRaNgoai/GetAllViewKhaiBaoRaNgoais'
+      GET_ALL: '/api/services/app/KhaiBaoRaNgoai/GetAllViewKhaiBaoRaNgoais',
+      UPDATE: '/api/services/app/TuanAnhAppServices/UpdateKhaiBaoRaNgoai'
     }
   }
 };

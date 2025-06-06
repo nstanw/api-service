@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -39,6 +39,7 @@ class ApiServer {
   private updateTonKhoSoSachService: UpdateTonKhoSoSachService;
   private updateTonKhoService: UpdateTonKhoService;
   private getAllKhaiBaoRaNgoaiService: GetAllKhaiBaoRaNgoaiService;
+  private updateKhaiBaoRaNgoaiService: UpdateKhaiBaoRaNgoaiService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -59,6 +60,7 @@ class ApiServer {
     this.updateTonKhoSoSachService = new UpdateTonKhoSoSachService();
     this.updateTonKhoService = new UpdateTonKhoService();
     this.getAllKhaiBaoRaNgoaiService = new GetAllKhaiBaoRaNgoaiService();
+    this.updateKhaiBaoRaNgoaiService = new UpdateKhaiBaoRaNgoaiService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -361,6 +363,18 @@ class ApiServer {
             after: { type: 'string', description: 'Lấy dữ liệu sau marker này' }
           },
           required: []
+        }
+      },
+      update_khai_bao_ra_ngoai: {
+        description: 'Cập nhật khai báo ra ngoài',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            khaiBaoID: { type: 'number', description: 'ID khai báo cần cập nhật' },
+            tuNgay: { type: 'string', description: 'Thời gian bắt đầu (ISO format)' },
+            denNgay: { type: 'string', description: 'Thời gian kết thúc (ISO format)' }
+          },
+          required: ['khaiBaoID', 'tuNgay', 'denNgay']
         }
       }
     };
@@ -824,6 +838,28 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi chuyển hồ sơ miễn phí trạm nâm dan', { params, error });
             return createResponse('Lỗi khi chuyển hồ sơ miễn phí trạm nâm dan: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'update_khai_bao_ra_ngoai': {
+          const args = request.params.arguments || {};
+          const params = {
+            khaiBaoID: Number(args.khaiBaoID || 0),
+            tuNgay: String(args.tuNgay || ''),
+            denNgay: String(args.denNgay || '')
+          };
+
+          if (!params.khaiBaoID || !params.tuNgay || !params.denNgay) {
+            return createResponse('Thiếu tham số bắt buộc (khaiBaoID, tuNgay, denNgay)');
+          }
+
+          try {
+            const result = await this.updateKhaiBaoRaNgoaiService.updateKhaiBaoRaNgoai(params);
+            this.logger.info('Cập nhật khai báo ra ngoài thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật khai báo ra ngoài', { params, error });
+            return createResponse('Lỗi khi cập nhật khai báo ra ngoài: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

@@ -15,8 +15,12 @@ export class UpdateKhaiBaoRaNgoaiService {
       
       const queryParams = new URLSearchParams();
       queryParams.append('khaiBaoID', input.khaiBaoID.toString());
-      queryParams.append('tuNgay', input.tuNgay);
-      queryParams.append('denNgay', input.denNgay);
+      if (input.thoiGianBatDauThucTe) {
+        queryParams.append('thoiGianBatDauThucTe', input.thoiGianBatDauThucTe);
+      }
+      if (input.thoiGianKetThucThucTe) {
+        queryParams.append('thoiGianKetThucThucTe', input.thoiGianKetThucThucTe);
+      }
 
       const url = `${CONFIG.TOOLS.KHAI_BAO_RA_NGOAI.UPDATE}?${queryParams}`;
       

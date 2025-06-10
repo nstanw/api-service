@@ -146,6 +146,6 @@ export interface GetAllKhaiBaoRaNgoaiInput {
 
 export interface UpdateKhaiBaoRaNgoaiInput {
   khaiBaoID: number;
-  tuNgay: string;
-  denNgay: string;
+  thoiGianBatDauThucTe?: string;
+  thoiGianKetThucThucTe?: string;
 }

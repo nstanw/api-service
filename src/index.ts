@@ -371,10 +371,10 @@ class ApiServer {
           type: 'object',
           properties: {
             khaiBaoID: { type: 'number', description: 'ID khai báo cần cập nhật' },
-            tuNgay: { type: 'string', description: 'Thời gian bắt đầu (ISO format)' },
-            denNgay: { type: 'string', description: 'Thời gian kết thúc (ISO format)' }
+            thoiGianBatDauThucTe: { type: 'string', description: 'Thời gian bắt đầu thực tế (ISO format)' },
+            thoiGianKetThucThucTe: { type: 'string', description: 'Thời gian kết thúc thực tế (ISO format)' }
           },
-          required: ['khaiBaoID', 'tuNgay', 'denNgay']
+          required: ['khaiBaoID']
         }
       }
     };
@@ -845,12 +845,12 @@ class ApiServer {
           const args = request.params.arguments || {};
           const params = {
             khaiBaoID: Number(args.khaiBaoID || 0),
-            tuNgay: String(args.tuNgay || ''),
-            denNgay: String(args.denNgay || '')
+            thoiGianBatDauThucTe: args.thoiGianBatDauThucTe ? String(args.thoiGianBatDauThucTe) : undefined,
+            thoiGianKetThucThucTe: args.thoiGianKetThucThucTe ? String(args.thoiGianKetThucThucTe) : undefined
           };
 
-          if (!params.khaiBaoID || !params.tuNgay || !params.denNgay) {
-            return createResponse('Thiếu tham số bắt buộc (khaiBaoID, tuNgay, denNgay)');
+          if (!params.khaiBaoID) {
+            return createResponse('Thiếu tham số bắt buộc (khaiBaoID)');
           }
 
           try {

@@ -44,3 +44,17 @@ Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tậ
 - Đối với đăng ký ăn sáng:
   - Kiểm tra thông tin nhân viên trước
   - Xác nhận ngày đăng ký chính xác
+
+## Sửa giờ khai báo ra ngoài
+- Quy trình xử lý:
+  1. Tìm kiếm nhân viên:
+     - Sử dụng search_employee với họ tên đầy đủ
+     - Nếu không tìm thấy, thử tìm với từng phần của tên
+     - Yêu cầu người dùng xác nhận mã nhân viên trước khi tiếp tục
+  2. Xem lịch sử khai báo:
+     - Sử dụng get_all_khai_bao_ra_ngoai với limit mặc định là 5
+     - Hiển thị danh sách để người dùng chọn
+  3. Cập nhật thông tin:
+     - Yêu cầu người dùng xác nhận khaiBaoID và giờ cần cập nhật
+     - Sử dụng update_khai_bao_ra_ngoai để thực hiện thay đổi
+     - Kiểm tra lại kết quả sau khi cập nhật

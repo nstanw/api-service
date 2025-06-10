@@ -2,6 +2,10 @@
 
 Máy chủ Model Context Protocol (MCP) để tương tác với các API hệ thống nội bộ
 
+<a href="https://glama.ai/mcp/servers/@nstanw/api-service">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@nstanw/api-service/badge" alt="API Service MCP server" />
+</a>
+
 ## Kiến Trúc Hệ Thống
 
 ### Tổng Quan

@@ -149,3 +149,19 @@ export interface UpdateKhaiBaoRaNgoaiInput {
   thoiGianBatDauThucTe?: string;
   thoiGianKetThucThucTe?: string;
 }
+
+export interface GetAllDuongPhoLDInput {
+  limit?: number;
+  start?: number;
+  filter?: string;
+  q?: string;
+  sort?: string;
+  order?: string;
+  after?: string;
+}
+
+export interface AddDuongPhoLDInput {
+  madpld: string;
+  tenduongld: string;
+  maphuong?: string;
+}

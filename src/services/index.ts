@@ -19,3 +19,5 @@ export * from './update-ton-kho-so-sach.service.js';
 export * from './update-ton-kho.service.js';
 export * from './get-all-khai-bao-ra-ngoai.service.js';
 export * from './update-khai-bao-ra-ngoai.service.js';
+export * from './get-all-duong-pho-ld.service.js';
+export * from './add-duong-pho-ld.service.js';

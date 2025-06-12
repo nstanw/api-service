@@ -54,6 +54,10 @@ const CONFIG = {
     KHAI_BAO_RA_NGOAI: {
       GET_ALL: '/api/services/app/KhaiBaoRaNgoai/GetAllViewKhaiBaoRaNgoais',
       UPDATE: '/api/services/app/TuanAnhAppServices/UpdateKhaiBaoRaNgoai'
+    },
+    DUONG_PHO: {
+      GET_ALL: '/api/services/app/DuongPhoLD/GetAll',
+      ADD: '/api/services/app/DuongPhoLD/AddDuongPhoLD'
     }
   }
 };

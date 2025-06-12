@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -40,6 +40,8 @@ class ApiServer {
   private updateTonKhoService: UpdateTonKhoService;
   private getAllKhaiBaoRaNgoaiService: GetAllKhaiBaoRaNgoaiService;
   private updateKhaiBaoRaNgoaiService: UpdateKhaiBaoRaNgoaiService;
+  private getAllDuongPhoLDService: GetAllDuongPhoLDService;
+  private addDuongPhoLDService: AddDuongPhoLDService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -61,6 +63,8 @@ class ApiServer {
     this.updateTonKhoService = new UpdateTonKhoService();
     this.getAllKhaiBaoRaNgoaiService = new GetAllKhaiBaoRaNgoaiService();
     this.updateKhaiBaoRaNgoaiService = new UpdateKhaiBaoRaNgoaiService();
+    this.getAllDuongPhoLDService = new GetAllDuongPhoLDService();
+    this.addDuongPhoLDService = new AddDuongPhoLDService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -375,6 +379,34 @@ class ApiServer {
             thoiGianKetThucThucTe: { type: 'string', description: 'Thời gian kết thúc thực tế (ISO format)' }
           },
           required: ['khaiBaoID']
+        }
+      },
+      get_all_duong_pho_ld: {
+        description: 'Lấy danh sách tất cả đường phố LD',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Số lượng bản ghi tối đa' },
+            start: { type: 'number', description: 'Vị trí bắt đầu' },
+            filter: { type: 'string', description: 'Bộ lọc tìm kiếm' },
+            q: { type: 'string', description: 'Từ khóa tìm kiếm' },
+            sort: { type: 'string', description: 'Trường sắp xếp' },
+            order: { type: 'string', description: 'Thứ tự sắp xếp (asc/desc)' },
+            after: { type: 'string', description: 'Lấy dữ liệu sau marker này' }
+          },
+          required: []
+        }
+      },
+      add_duong_pho_ld: {
+        description: 'Thêm đường phố LD mới',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            madpld: { type: 'string', description: 'Mã đường phố LD' },
+            tenduongld: { type: 'string', description: 'Tên đường LD' },
+            maphuong: { type: 'string', description: 'Mã phường (tùy chọn)' }
+          },
+          required: ['madpld', 'tenduongld']
         }
       }
     };
@@ -882,6 +914,50 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi lấy danh sách khai báo ra ngoài', { params, error });
             return createResponse('Lỗi khi lấy danh sách khai báo ra ngoài: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'get_all_duong_pho_ld': {
+          const args = request.params.arguments || {};
+          const params = {
+            limit: args.limit !== undefined ? Number(args.limit) : undefined,
+            start: args.start !== undefined ? Number(args.start) : undefined,
+            filter: args.filter ? String(args.filter) : undefined,
+            q: args.q ? String(args.q) : undefined,
+            sort: args.sort ? String(args.sort) : undefined,
+            order: args.order ? String(args.order) : undefined,
+            after: args.after ? String(args.after) : undefined
+          };
+
+          try {
+            const result = await this.getAllDuongPhoLDService.getAllDuongPhoLD(params);
+            this.logger.info('Lấy danh sách đường phố LD thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi lấy danh sách đường phố LD', { params, error });
+            return createResponse('Lỗi khi lấy danh sách đường phố LD: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'add_duong_pho_ld': {
+          const args = request.params.arguments || {};
+          const params = {
+            madpld: String(args.madpld || ''),
+            tenduongld: String(args.tenduongld || ''),
+            maphuong: args.maphuong ? String(args.maphuong) : undefined
+          };
+
+          if (!params.madpld || !params.tenduongld) {
+            return createResponse('Thiếu tham số bắt buộc (madpld, tenduongld)');
+          }
+
+          try {
+            const result = await this.addDuongPhoLDService.addDuongPhoLD(params);
+            this.logger.info('Thêm đường phố LD thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi thêm đường phố LD', { params, error });
+            return createResponse('Lỗi khi thêm đường phố LD: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

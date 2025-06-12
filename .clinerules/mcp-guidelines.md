@@ -58,3 +58,36 @@ Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tậ
      - Yêu cầu người dùng xác nhận khaiBaoID và giờ cần cập nhật
      - Sử dụng update_khai_bao_ra_ngoai để thực hiện thay đổi
      - Kiểm tra lại kết quả sau khi cập nhật
+
+## Thêm tên đường mới
+- Quy trình xử lý:
+  1. Kiểm tra tên đường:
+     - Sử dụng get_all_duong_pho_ld với từ khóa tìm kiếm chính xác
+     - Nếu không tìm thấy, thử tìm với từng phần của tên
+     - Kiểm tra các đường có tên tương tự để tránh trùng lặp
+  
+  2. Quy tắc đặt mã đường (madpld):
+     - Tối đa 4 ký tự in hoa
+     - Ưu tiên sử dụng chữ cái đầu của các từ trong tên đường
+     - Kiểm tra mã đề xuất trước khi sử dụng để đảm bảo không trùng
+     - Một số mẫu phổ biến:
+       + 2 ký tự: Viết tắt 2 từ đầu (VD: DL - Duy Tân)
+       + 3 ký tự: Thêm một ký tự để phân biệt (VD: DLI - Đông Liên)
+       + 4 ký tự: Thêm ký tự đặc trưng (VD: DLIE - Đông Liên)
+
+  3. Thêm đường mới:
+     - Sử dụng add_duong_pho_ld với các tham số bắt buộc:
+       + madpld: Mã đường đã kiểm tra không trùng
+       + tenduongld: Tên đường chuẩn hóa
+     - maphuong: Có thể để trống (null) và cập nhật sau
+     - Kiểm tra kết quả sau khi thêm mới
+
+  4. Xác minh thông tin:
+     - Tìm kiếm lại bằng get_all_duong_pho_ld để kiểm tra
+     - Đảm bảo thông tin đã được thêm chính xác
+
+- Lưu ý đặc biệt:
+  + Đảm bảo tính duy nhất của mã đường
+  + Chuẩn hóa tên đường (viết hoa chữ cái đầu)
+  + Tham khảo mã của các đường tương tự khi đặt mã mới
+  + Ghi chép lại các thay đổi vào log hệ thống

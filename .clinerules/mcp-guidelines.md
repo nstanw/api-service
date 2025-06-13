@@ -2,6 +2,8 @@
 Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tập trung vào việc xử lý các thao tác liên quan đến lệnh điều xe và các chức năng khác
 
 ## Quy tắc sử dụng
+- Luôn kiểm tra ngày hiện tại đầu tiên khi xử lý ngày tháng
+- Sử dụng định dạng : YYYY-MM-DDTHH:mm:ss.sss (ví dụ: 2025-06-09T00:00:00.000) vì BE dùng C#
 - Luôn kiểm tra dữ liệu hiện tại trước khi thực hiện bất kỳ thay đổi nào
 - Chỉ thay đổi các trường cần thiết, giữ nguyên các trường khác
 - Xác nhận dữ liệu sau khi cập nhật để đảm bảo tính chính xác
@@ -58,6 +60,32 @@ Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tậ
      - Yêu cầu người dùng xác nhận khaiBaoID và giờ cần cập nhật
      - Sử dụng update_khai_bao_ra_ngoai để thực hiện thay đổi
      - Kiểm tra lại kết quả sau khi cập nhật
+
+## Sửa đổi lệnh điều xe
+- Quy trình xử lý:
+  1. Kiểm tra thông tin hiện tại:
+     - Sử dụng get_lenh_dieu_xe_may để xem chi tiết lệnh điều xe
+     - Xác nhận mã lệnh và các trường thông tin hiện tại
+     - Đảm bảo trạng thái lệnh cho phép sửa đổi
+
+  2. Thực hiện cập nhật:
+     - Đối với thời gian:
+       + Sử dụng định dạng ISO 8601 với múi giờ UTC: YYYY-MM-DDTHH:mm:ss.sss
+       + Ví dụ: "2025-06-11T10:18:00.000"
+     - Đối với vị trí:
+       + Kiểm tra tính hợp lý của luồng di chuyển
+       + Xác nhận đúng định dạng tên địa điểm
+     - Đối với xóa lệnh:
+       + Đảm bảo không ảnh hưởng đến các lệnh liên quan
+
+  3. Xác minh kết quả:
+     - Gọi lại get_lenh_dieu_xe_may để kiểm tra
+     - Đảm bảo tất cả thông tin đã được cập nhật đúng
+     - Kiểm tra các trường không liên quan vẫn giữ nguyên
+
+- Lưu ý đặc biệt:
+  + Kiểm tra tính hợp lý của thời gian trong chuỗi lệnh
+  + Đảm bảo tính liên tục của chỉ số công tơ mét
 
 ## Thêm tên đường mới
 - Quy trình xử lý:

@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -42,6 +42,7 @@ class ApiServer {
   private updateKhaiBaoRaNgoaiService: UpdateKhaiBaoRaNgoaiService;
   private getAllDuongPhoLDService: GetAllDuongPhoLDService;
   private addDuongPhoLDService: AddDuongPhoLDService;
+  private thanhToanTheoKyService: ThanhToanTheoKyService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -65,6 +66,7 @@ class ApiServer {
     this.updateKhaiBaoRaNgoaiService = new UpdateKhaiBaoRaNgoaiService();
     this.getAllDuongPhoLDService = new GetAllDuongPhoLDService();
     this.addDuongPhoLDService = new AddDuongPhoLDService();
+    this.thanhToanTheoKyService = new ThanhToanTheoKyService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -407,6 +409,20 @@ class ApiServer {
             maphuong: { type: 'string', description: 'Mã phường (tùy chọn)' }
           },
           required: ['madpld', 'tenduongld']
+        }
+      },
+      thanh_toan_theo_ky: {
+        description: 'Thanh toán theo kỳ',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            idkh: { type: 'string', description: 'ID khách hàng' },
+            thang: { type: 'number', description: 'Tháng thanh toán' },
+            nam: { type: 'number', description: 'Năm thanh toán' },
+            soTienThanhToan: { type: 'number', description: 'Số tiền thanh toán' },
+            transactionID: { type: 'string', description: 'ID giao dịch' }
+          },
+          required: ['thang', 'nam', 'soTienThanhToan']
         }
       }
     };
@@ -958,6 +974,30 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi thêm đường phố LD', { params, error });
             return createResponse('Lỗi khi thêm đường phố LD: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'thanh_toan_theo_ky': {
+          const args = request.params.arguments || {};
+          const params = {
+            idkh: args.idkh ? String(args.idkh) : null,
+            thang: Number(args.thang || 0),
+            nam: Number(args.nam || 0),
+            soTienThanhToan: Number(args.soTienThanhToan || 0),
+            transactionID: args.transactionID ? String(args.transactionID) : null
+          };
+
+          if (!params.thang || !params.nam || !params.soTienThanhToan) {
+            return createResponse('Thiếu tham số bắt buộc (thang, nam, soTienThanhToan)');
+          }
+
+          try {
+            const result = await this.thanhToanTheoKyService.thanhToanTheoKy(params);
+            this.logger.info('Thanh toán theo kỳ thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi thực hiện thanh toán theo kỳ', { params, error });
+            return createResponse('Có lỗi xảy ra: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

@@ -58,6 +58,9 @@ const CONFIG = {
     DUONG_PHO: {
       GET_ALL: '/api/services/app/DuongPhoLD/GetAll',
       ADD: '/api/services/app/DuongPhoLD/AddDuongPhoLD'
+    },
+    NGAN_HANG: {
+      THANH_TOAN_THEO_KY: '/api/services/app/NganHang/ThanhToanTheoKy'
     }
   }
 };

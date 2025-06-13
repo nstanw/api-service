@@ -165,3 +165,11 @@ export interface AddDuongPhoLDInput {
   tenduongld: string;
   maphuong?: string;
 }
+
+export interface InputThanhToanTheoKy {
+  idkh?: string | null;
+  thang: number;
+  nam: number;
+  soTienThanhToan: number;
+  transactionID?: string | null;
+}

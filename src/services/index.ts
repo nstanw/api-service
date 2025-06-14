@@ -22,3 +22,4 @@ export * from './update-khai-bao-ra-ngoai.service.js';
 export * from './get-all-duong-pho-ld.service.js';
 export * from './add-duong-pho-ld.service.js';
 export * from './thanh-toan-theo-ky.service.js';
+export * from './dang-ky-dieu-dong.service.js';

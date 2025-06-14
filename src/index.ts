@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -43,6 +43,7 @@ class ApiServer {
   private getAllDuongPhoLDService: GetAllDuongPhoLDService;
   private addDuongPhoLDService: AddDuongPhoLDService;
   private thanhToanTheoKyService: ThanhToanTheoKyService;
+  private dangKyDieuDongService: typeof dangKyDieuDongService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -67,6 +68,7 @@ class ApiServer {
     this.getAllDuongPhoLDService = new GetAllDuongPhoLDService();
     this.addDuongPhoLDService = new AddDuongPhoLDService();
     this.thanhToanTheoKyService = new ThanhToanTheoKyService();
+    this.dangKyDieuDongService = dangKyDieuDongService;
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -423,6 +425,25 @@ class ApiServer {
             transactionID: { type: 'string', description: 'ID giao dịch' }
           },
           required: ['thang', 'nam', 'soTienThanhToan']
+        }
+      },
+      dang_ky_dieu_dong: {
+        description: 'Đăng ký điều động nhân viên',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            ngayBatDau: { type: 'string', description: 'Ngày bắt đầu (ISO format)' },
+            buoiBatDau: { type: 'string', description: 'Buổi bắt đầu (tùy chọn)' },
+            ngayKetThuc: { type: 'string', description: 'Ngày kết thúc (ISO format)' },
+            buoiKetThuc: { type: 'string', description: 'Buổi kết thúc (tùy chọn)' },
+            ngayDoi: { type: 'string', description: 'Ngày đổi (ISO format, tùy chọn)' },
+            buoiDoi: { type: 'string', description: 'Buổi đổi (tùy chọn)' },
+            loaiLyDo: { type: 'string', description: 'Loại lý do (tùy chọn)' },
+            chiTietLyDo: { type: 'string', description: 'Chi tiết lý do (tùy chọn)' },
+            hinhThucDieuDong: { type: 'string', description: 'Hình thức điều động (tùy chọn)' },
+            maNV: { type: 'string', description: 'Mã nhân viên (tùy chọn)' }
+          },
+          required: ['ngayBatDau', 'ngayKetThuc']
         }
       }
     };
@@ -998,6 +1019,35 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi thực hiện thanh toán theo kỳ', { params, error });
             return createResponse('Có lỗi xảy ra: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'dang_ky_dieu_dong': {
+          const args = request.params.arguments || {};
+          const params = {
+            ngayBatDau: String(args.ngayBatDau || ''),
+            buoiBatDau: args.buoiBatDau ? String(args.buoiBatDau) : undefined,
+            ngayKetThuc: String(args.ngayKetThuc || ''),
+            buoiKetThuc: args.buoiKetThuc ? String(args.buoiKetThuc) : undefined,
+            ngayDoi: args.ngayDoi ? String(args.ngayDoi) : undefined,
+            buoiDoi: args.buoiDoi ? String(args.buoiDoi) : undefined,
+            loaiLyDo: args.loaiLyDo ? String(args.loaiLyDo) : undefined,
+            chiTietLyDo: args.chiTietLyDo ? String(args.chiTietLyDo) : undefined,
+            hinhThucDieuDong: args.hinhThucDieuDong ? String(args.hinhThucDieuDong) : undefined,
+            maNV: args.maNV ? String(args.maNV) : undefined
+          };
+
+          if (!params.ngayBatDau || !params.ngayKetThuc) {
+            return createResponse('Thiếu tham số bắt buộc (ngayBatDau, ngayKetThuc)');
+          }
+
+          try {
+            const result = await this.dangKyDieuDongService.dangKyDieuDong(params);
+            this.logger.info('Đăng ký điều động thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi đăng ký điều động', { params, error });
+            return createResponse('Có lỗi xảy ra khi đăng ký điều động: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

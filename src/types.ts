@@ -173,3 +173,16 @@ export interface InputThanhToanTheoKy {
   soTienThanhToan: number;
   transactionID?: string | null;
 }
+
+export interface CreateKhaiBaoNgayNghiInput {
+  ngayBatDau: string;
+  buoiBatDau?: string;
+  ngayKetThuc: string;
+  buoiKetThuc?: string;
+  ngayDoi?: string;
+  buoiDoi?: string;
+  loaiLyDo?: string;
+  chiTietLyDo?: string;
+  hinhThucDieuDong?: string;
+  maNV?: string;
+}

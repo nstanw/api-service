@@ -40,7 +40,8 @@ const CONFIG = {
       GET_LENH_DIEU_XE_MAY: '/api/services/app/TuanAnhAppServices/GetLenhDieuXeMay',
       PHAN_CONG_NHAN_VIEN_THI_CONG: '/api/services/app/MangCap4/PhanCongNhanVienThiCong',
       PHAN_CONG_NHAN_VIEN_THI_CONG_LIST: '/api/services/app/TuanAnhAppServices/PhanCongNhanVienThiCongList',
-      CHUYEN_HO_SO_MIEN_PHI_TRAM_NAM_DAN: '/api/services/app/QuyetToanMangCap4/ChuyenHoSoMienPhiTramNamDan'
+      CHUYEN_HO_SO_MIEN_PHI_TRAM_NAM_DAN: '/api/services/app/QuyetToanMangCap4/ChuyenHoSoMienPhiTramNamDan',
+      DANG_KY_DIEU_DONG: '/api/services/app/TuanAnhAppServices/DangKyDieuDong'
     },
     NHA_SAN_XUAT: {
       ADD: '/api/services/app/NhaSanXuat/AddNhaSanXuat'

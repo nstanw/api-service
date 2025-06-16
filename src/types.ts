@@ -160,6 +160,16 @@ export interface GetAllDuongPhoLDInput {
   after?: string;
 }
 
+export interface GetAllMangCap4Input {
+  limit?: number;
+  start?: number;
+  filter?: string;
+  q?: string;
+  sort?: string;
+  order?: string;
+  after?: string;
+}
+
 export interface AddDuongPhoLDInput {
   madpld: string;
   tenduongld: string;

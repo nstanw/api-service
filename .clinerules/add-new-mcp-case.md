@@ -68,3 +68,7 @@ case 'ten_tool_moi': {
     return createResponse('Có lỗi xảy ra khi thực hiện tool mới: ' + (error instanceof Error ? error : String(error)));
   }
 }
+```
+
+## Lưu ý sau khi thêm tool mới
+- Sau khi hoàn tất các bước thêm tool mới vào MCP server, cần chạy lệnh `npm run build` để build lại dự án và áp dụng các thay đổi.

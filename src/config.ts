@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const CONFIG = {
-  // API_BASE_URL: process.env.API_BASE_URL || 'https://localhost:44311/',
-  API_BASE_URL: process.env.API_BASE_URL || 'http://118.70.151.182:1223/',
+  API_BASE_URL: process.env.API_BASE_URL || 'https://localhost:44311/',
+  // API_BASE_URL: process.env.API_BASE_URL || 'http://118.70.151.182:1223/',
 
   LOG_PATH: process.env.LOG_PATH || './logs',
   NODE_ENV: process.env.NODE_ENV || 'development',
@@ -62,6 +62,9 @@ const CONFIG = {
     },
     NGAN_HANG: {
       THANH_TOAN_THEO_KY: '/api/services/app/NganHang/ThanhToanTheoKy'
+    },
+    MANG_CAP4: {
+      GET_ALL: '/api/services/app/MangCap4/GetAll'
     }
   }
 };

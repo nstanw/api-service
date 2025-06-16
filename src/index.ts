@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService, GetAllMangCap4Service } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -44,6 +44,7 @@ class ApiServer {
   private addDuongPhoLDService: AddDuongPhoLDService;
   private thanhToanTheoKyService: ThanhToanTheoKyService;
   private dangKyDieuDongService: typeof dangKyDieuDongService;
+  private getAllMangCap4Service: GetAllMangCap4Service;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -69,6 +70,7 @@ class ApiServer {
     this.addDuongPhoLDService = new AddDuongPhoLDService();
     this.thanhToanTheoKyService = new ThanhToanTheoKyService();
     this.dangKyDieuDongService = dangKyDieuDongService;
+    this.getAllMangCap4Service = new GetAllMangCap4Service();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -411,6 +413,22 @@ class ApiServer {
             maphuong: { type: 'string', description: 'Mã phường (tùy chọn)' }
           },
           required: ['madpld', 'tenduongld']
+        }
+      },
+      get_all_mang_cap4: {
+        description: 'Lấy danh sách tất cả dữ liệu Mạng Cáp 4',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Số lượng bản ghi tối đa' },
+            start: { type: 'number', description: 'Vị trí bắt đầu' },
+            filter: { type: 'string', description: 'Bộ lọc tìm kiếm' },
+            q: { type: 'string', description: 'Từ khóa tìm kiếm' },
+            sort: { type: 'string', description: 'Trường sắp xếp' },
+            order: { type: 'string', description: 'Thứ tự sắp xếp (asc/desc)' },
+            after: { type: 'string', description: 'Lấy dữ liệu sau marker này' }
+          },
+          required: []
         }
       },
       thanh_toan_theo_ky: {
@@ -995,6 +1013,28 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi thêm đường phố LD', { params, error });
             return createResponse('Lỗi khi thêm đường phố LD: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'get_all_mang_cap4': {
+          const args = request.params.arguments || {};
+          const params = {
+            limit: args.limit !== undefined ? Number(args.limit) : undefined,
+            start: args.start !== undefined ? Number(args.start) : undefined,
+            filter: args.filter ? String(args.filter) : undefined,
+            q: args.q ? String(args.q) : undefined,
+            sort: args.sort ? String(args.sort) : undefined,
+            order: args.order ? String(args.order) : undefined,
+            after: args.after ? String(args.after) : undefined
+          };
+
+          try {
+            const result = await this.getAllMangCap4Service.getAllMangCap4(params);
+            this.logger.info('Lấy danh sách dữ liệu Mạng Cáp 4 thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi lấy danh sách dữ liệu Mạng Cáp 4', { params, error });
+            return createResponse('Lỗi khi lấy danh sách dữ liệu Mạng Cáp 4: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

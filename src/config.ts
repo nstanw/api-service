@@ -10,6 +10,7 @@ const CONFIG = {
   LOG_PATH: process.env.LOG_PATH || './logs',
   NODE_ENV: process.env.NODE_ENV || 'development',
   TOOLS: {
+    KHAI_BAO_NGHI_TUAN: '/api/services/app/KhaiBaoNgayNghi/DangKyNghiTuan',
     STATUS: {
       CHECK: '/api/services/app/Session/GetCurrentLoginInformations'
     },

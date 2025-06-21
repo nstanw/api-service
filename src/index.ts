@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService, GetAllMangCap4Service } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService, GetAllMangCap4Service, KhaiBaoNghiTuanService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -45,6 +45,7 @@ class ApiServer {
   private thanhToanTheoKyService: ThanhToanTheoKyService;
   private dangKyDieuDongService: typeof dangKyDieuDongService;
   private getAllMangCap4Service: GetAllMangCap4Service;
+  private khaiBaoNghiTuanService: KhaiBaoNghiTuanService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -71,6 +72,7 @@ class ApiServer {
     this.thanhToanTheoKyService = new ThanhToanTheoKyService();
     this.dangKyDieuDongService = dangKyDieuDongService;
     this.getAllMangCap4Service = new GetAllMangCap4Service();
+    this.khaiBaoNghiTuanService = new KhaiBaoNghiTuanService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
@@ -462,6 +464,17 @@ class ApiServer {
             maNV: { type: 'string', description: 'Mã nhân viên (tùy chọn)' }
           },
           required: ['ngayBatDau', 'ngayKetThuc']
+        }
+      },
+      dang_ky_nghi_tuan: {
+        description: 'Đăng ký nghỉ tuần',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            manv: { type: 'string', description: 'Mã nhân viên' },
+            ngay: { type: 'string', description: 'Ngày nghỉ (ISO format)' }
+          },
+          required: ['manv', 'ngay']
         }
       }
     };
@@ -1088,6 +1101,27 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi đăng ký điều động', { params, error });
             return createResponse('Có lỗi xảy ra khi đăng ký điều động: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+
+        case 'dang_ky_nghi_tuan': {
+          const args = request.params.arguments || {};
+          const params = {
+            manv: String(args.manv || ''),
+            ngay: String(args.ngay || '')
+          };
+
+          if (!params.manv || !params.ngay) {
+            return createResponse('Thiếu tham số bắt buộc (manv, ngay)');
+          }
+
+          try {
+            const result = await this.khaiBaoNghiTuanService.dangKyNghiTuan(params);
+            this.logger.info('Đăng ký nghỉ tuần thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi đăng ký nghỉ tuần', { params, error });
+            return createResponse('Có lỗi xảy ra khi đăng ký nghỉ tuần: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

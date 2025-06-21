@@ -196,3 +196,9 @@ export interface CreateKhaiBaoNgayNghiInput {
   hinhThucDieuDong?: string;
   maNV?: string;
 }
+
+export interface DangKyNghiTuanInput {
+  manv: string;
+  ngay: string;
+  nthiphuong?: string;
+}

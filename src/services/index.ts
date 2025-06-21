@@ -24,3 +24,4 @@ export * from './add-duong-pho-ld.service.js';
 export * from './get-all-mang-cap4.service.js';
 export * from './thanh-toan-theo-ky.service.js';
 export * from './dang-ky-dieu-dong.service.js';
+export * from './KhaiBaoNghiTuan.service.js';

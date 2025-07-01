@@ -118,6 +118,11 @@ export interface UpdateTonKhoInput {
   maKhoVatTu: number;
 }
 
+export interface UpdateNhanVienChucVuInput {
+  maNhanVien: string;
+  maPhongBan: string;
+}
+
 export interface UpdateTonKhoSoSachInput {
   maKhoVatTu: number;
   maVatTuHangHoa: number;
@@ -201,4 +206,23 @@ export interface DangKyNghiTuanInput {
   manv: string;
   ngay: string;
   nthiphuong?: string;
+}
+
+export interface GetAllPhuongInput {
+  limit?: number;
+  start?: number;
+  filter?: string;
+  q?: string;
+  sort?: string;
+  order?: string;
+  after?: string;
+}
+
+export interface PhuongDto {
+  maphuong: string;
+  maquan: string;
+  tenquan: string;
+  tenphuong: string;
+  tenPhuongQuan: string;
+  id: string;
 }

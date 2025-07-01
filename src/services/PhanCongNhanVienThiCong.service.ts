@@ -8,18 +8,18 @@ export class PhanCongNhanVienThiCongService {
 
   async phanCongNhanVienThiCong(input: PhanCongNhanVienThiCongInput) {
     try {
-      this.logger.debug('Calling phan cong nhan vien thi cong API', {
-        url: CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_THI_CONG,
+      this.logger.debug('Calling phan cong nhan vien thi cong (Mạng Cấp 4) API', {
+        url: CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_THI_CONG_MANG_CAP_4,
         input
       });
       
       const response = await ApiClient.post<any>(
-        CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_THI_CONG,
+        CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_THI_CONG_MANG_CAP_4,
         null,
         { params: input });
       
       this.logger.debug('API Response received', { response });
-      this.logger.info('Successfully phan cong nhan vien thi cong', { input });
+      this.logger.info('Successfully phan cong nhan vien thi cong (Mạng Cấp 4)', { input });
       
       return response.result;
     } catch (error: any) {
@@ -28,7 +28,7 @@ export class PhanCongNhanVienThiCongService {
         stack: error.stack,
         response: error.response?.data
       });
-      this.logger.error('Error phan cong nhan vien thi cong', { error, input });
+      this.logger.error('Error phan cong nhan vien thi cong (Mạng Cấp 4)', { error, input });
       throw error;
     }
   }

@@ -68,6 +68,7 @@ case 'ten_tool_moi': {
     return createResponse('Có lỗi xảy ra khi thực hiện tool mới: ' + (error instanceof Error ? error : String(error)));
   }
 }
+
 ```
 
 ## Lưu ý sau khi thêm tool mới

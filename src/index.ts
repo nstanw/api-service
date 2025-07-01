@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema, 
   CallToolRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService, GetAllMangCap4Service, KhaiBaoNghiTuanService } from './services/index.js';
+import { employeeService, breakfastService, HoaChatService, StatusService, XoaAnhNghiemThuService, LenhDieuXeMayService, ChuyenNhanVienThiCongGiaoKhoanService, PhanCongNhanVienKyThuatService, MoInLaiPhieuXuatKhoService, AddNhaSanXuatService, ThemNhanVienSXNService, UpdateTTHSMangCap4Service, ChuyenNhanVienKyThuatGiaoKhoanService, GetLenhDieuXeMayService, PhanCongNhanVienThiCongService, PhanCongNhanVienThiCongListService, ChuyenHoSoMienPhiTramNamDanService, UpdateTonKhoSoSachService, UpdateTonKhoService, UpdateNhanVienChucVuService, GetAllKhaiBaoRaNgoaiService, UpdateKhaiBaoRaNgoaiService, GetAllDuongPhoLDService, AddDuongPhoLDService, ThanhToanTheoKyService, dangKyDieuDongService, GetAllMangCap4Service, KhaiBaoNghiTuanService, GetAllPhuongService } from './services/index.js';
 import { Logger } from './utils/logger.js';
 
 interface Tool {
@@ -38,6 +38,7 @@ class ApiServer {
   private chuyenHoSoMienPhiTramNamDanService: ChuyenHoSoMienPhiTramNamDanService;
   private updateTonKhoSoSachService: UpdateTonKhoSoSachService;
   private updateTonKhoService: UpdateTonKhoService;
+  private updateNhanVienChucVuService: UpdateNhanVienChucVuService;
   private getAllKhaiBaoRaNgoaiService: GetAllKhaiBaoRaNgoaiService;
   private updateKhaiBaoRaNgoaiService: UpdateKhaiBaoRaNgoaiService;
   private getAllDuongPhoLDService: GetAllDuongPhoLDService;
@@ -46,6 +47,7 @@ class ApiServer {
   private dangKyDieuDongService: typeof dangKyDieuDongService;
   private getAllMangCap4Service: GetAllMangCap4Service;
   private khaiBaoNghiTuanService: KhaiBaoNghiTuanService;
+  private getAllPhuongService: GetAllPhuongService;
 
   constructor() {
     this.hoaChatService = new HoaChatService();
@@ -65,6 +67,7 @@ class ApiServer {
     this.chuyenHoSoMienPhiTramNamDanService = new ChuyenHoSoMienPhiTramNamDanService();
     this.updateTonKhoSoSachService = new UpdateTonKhoSoSachService();
     this.updateTonKhoService = new UpdateTonKhoService();
+    this.updateNhanVienChucVuService = new UpdateNhanVienChucVuService();
     this.getAllKhaiBaoRaNgoaiService = new GetAllKhaiBaoRaNgoaiService();
     this.updateKhaiBaoRaNgoaiService = new UpdateKhaiBaoRaNgoaiService();
     this.getAllDuongPhoLDService = new GetAllDuongPhoLDService();
@@ -73,12 +76,24 @@ class ApiServer {
     this.dangKyDieuDongService = dangKyDieuDongService;
     this.getAllMangCap4Service = new GetAllMangCap4Service();
     this.khaiBaoNghiTuanService = new KhaiBaoNghiTuanService();
+    this.getAllPhuongService = new GetAllPhuongService();
     const serverConfig = {
       name: 'api-service',
       version: '0.1.0'
     };
 
     this.tools = {
+      update_nhan_vien_chuc_vu: {
+        description: 'Cập nhật chức vụ nhân viên',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            maNhanVien: { type: 'string', description: 'Mã nhân viên' },
+            maPhongBan: { type: 'string', description: 'Mã phòng ban' }
+          },
+          required: ['maNhanVien', 'maPhongBan']
+        }
+      },
       check_connection: {
         description: 'Kiểm tra kết nối tới API server',
         inputSchema: {
@@ -158,8 +173,8 @@ class ApiServer {
           required: ['Code']
         }
       },
-      chuyen_nhan_vien_thi_cong: {
-        description: 'Chuyển nhân viên thi công giao khoán',
+      chuyen_nhan_vien_thi_cong_giao_khoan: {
+        description: 'Chuyển nhân viên thi công (Bản Giao Khoán)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -175,8 +190,8 @@ class ApiServer {
           required: ['code', 'nhanVienThiCong']
         }
       },
-      phan_cong_nhan_vien_ky_thuat: {
-        description: 'Phân công nhân viên kỹ thuật',
+      phan_cong_nhan_vien_ky_thuat_mang_cap_4: {
+        description: 'Phân công nhân viên kỹ thuật (Mạng Cấp 4)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -261,7 +276,7 @@ class ApiServer {
         }
       },
       chuyen_nhan_vien_ky_thuat_giao_khoan: {
-        description: 'Chuyển nhân viên kỹ thuật giao khoán',
+        description: 'Chuyển nhân viên kỹ thuật (Bản Giao Khoán)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -290,8 +305,8 @@ class ApiServer {
           required: ['Code']
         }
       },
-      phan_cong_nhan_vien_thi_cong: {
-        description: 'Phân công nhân viên thi công',
+      phan_cong_nhan_vien_thi_cong_mang_cap_4: {
+        description: 'Phân công nhân viên thi công (Mạng Cấp 4)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -476,6 +491,22 @@ class ApiServer {
           },
           required: ['manv', 'ngay']
         }
+      },
+      get_all_phuong: {
+        description: 'Lấy danh sách tất cả phường',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Số lượng bản ghi tối đa' },
+            start: { type: 'number', description: 'Vị trí bắt đầu' },
+            filter: { type: 'string', description: 'Bộ lọc tìm kiếm' },
+            q: { type: 'string', description: 'Từ khóa tìm kiếm' },
+            sort: { type: 'string', description: 'Trường sắp xếp' },
+            order: { type: 'string', description: 'Thứ tự sắp xếp (asc/desc)' },
+            after: { type: 'string', description: 'Lấy dữ liệu sau marker này' }
+          },
+          required: []
+        }
       }
     };
 
@@ -510,6 +541,26 @@ class ApiServer {
       });
 
       switch (request.params.name) {
+        case 'update_nhan_vien_chuc_vu': {
+          const args = request.params.arguments || {};
+          const params = {
+            maNhanVien: String(args.maNhanVien || ''),
+            maPhongBan: String(args.maPhongBan || '')
+          };
+
+          if (!params.maNhanVien || !params.maPhongBan) {
+            return createResponse('Thiếu tham số bắt buộc (maNhanVien, maPhongBan)');
+          }
+
+          try {
+            const result = await this.updateNhanVienChucVuService.updateNhanVienChucVu(params);
+            this.logger.info('Cập nhật chức vụ nhân viên thành công', { params, result });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi cập nhật chức vụ nhân viên', { params, error });
+            return createResponse('Có lỗi xảy ra khi cập nhật chức vụ nhân viên: ' + (error instanceof Error ? error : String(error)));
+          }
+        }
         case 'check_connection': {
           try {
             const result = await this.statusService.checkConnection();
@@ -647,7 +698,7 @@ class ApiServer {
           }
         }
 
-        case 'chuyen_nhan_vien_thi_cong': {
+        case 'chuyen_nhan_vien_thi_cong_giao_khoan': {
           const args = request.params.arguments || {};
           const params = {
             code: String(args.code || ''),
@@ -668,7 +719,7 @@ class ApiServer {
           }
         }
 
-        case 'phan_cong_nhan_vien_ky_thuat': {
+        case 'phan_cong_nhan_vien_ky_thuat_mang_cap_4': {
           const args = request.params.arguments || {};
           const params = {
             maddk: String(args.maddk || ''),
@@ -834,7 +885,7 @@ class ApiServer {
           }
         }
 
-        case 'phan_cong_nhan_vien_thi_cong': {
+        case 'phan_cong_nhan_vien_thi_cong_mang_cap_4': {
           const args = request.params.arguments || {};
           const params = {
             maddk: String(args.maddk || ''),
@@ -1122,6 +1173,18 @@ class ApiServer {
           } catch (error) {
             this.logger.error('Lỗi khi đăng ký nghỉ tuần', { params, error });
             return createResponse('Có lỗi xảy ra khi đăng ký nghỉ tuần: ' + (error instanceof Error ? error.message : String(error)));
+          }
+        }
+        
+        case 'get_all_phuong': {
+          const args = request.params.arguments || {};
+          try {
+            const result = await this.getAllPhuongService.getAllPhuong(args);
+            this.logger.info('Lấy danh sách phường thành công', { args });
+            return createResponse(JSON.stringify(result, null, 2));
+          } catch (error) {
+            this.logger.error('Lỗi khi lấy danh sách phường', { args, error });
+            return createResponse('Có lỗi xảy ra khi lấy danh sách phường: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 

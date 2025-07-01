@@ -8,19 +8,19 @@ export class PhanCongNhanVienKyThuatService {
 
   async phanCongNhanVienKyThuat(input: PhanCongNhanVienKyThuatInput) {
     try {
-      this.logger.debug('Calling phan cong nhan vien ky thuat API', {
-        url: CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_KY_THUAT,
+      this.logger.debug('Calling phan cong nhan vien ky thuat (Mạng Cấp 4) API', {
+        url: CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_KY_THUAT_MANG_CAP_4,
         input
       });
       
       const response = await ApiClient.post<any>(
-        CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_KY_THUAT, 
+        CONFIG.TOOLS.TUANANH.PHAN_CONG_NHAN_VIEN_KY_THUAT_MANG_CAP_4, 
         null,
         { params: input }
       );
       
       this.logger.debug('API Response received', { response });
-      this.logger.info('Successfully assigned technical staff', { input });
+      this.logger.info('Successfully assigned technical staff (Mạng Cấp 4)', { input });
       
       return response.result;
     } catch (error: any) {
@@ -29,7 +29,7 @@ export class PhanCongNhanVienKyThuatService {
         stack: error.stack,
         response: error.response?.data
       });
-      this.logger.error('Error assigning technical staff', { error, input });
+      this.logger.error('Error assigning technical staff (Mạng Cấp 4)', { error, input });
       throw error;
     }
   }

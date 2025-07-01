@@ -119,3 +119,15 @@ Hướng dẫn sử dụng MCP tools trong hệ thống ERP của công ty, tậ
   + Chuẩn hóa tên đường (viết hoa chữ cái đầu)
   + Tham khảo mã của các đường tương tự khi đặt mã mới
   + Ghi chép lại các thay đổi vào log hệ thống
+
+# Kết thúc ngày làm việc kỹ thuật
+- select * from cv.ViewThucHienCongViecTo2KTs where MaThucHienCongViecTo2KT = 16800
+
+
+select TrangThai, * from cv.ThucHienCongViecTo2KTs where MaThucHienCongViecTo2KT = 16800
+select TrangThai,KhoiLuong, NoiDungCongViec, * from cv.ThucHienCongViecTo2KTCTs where MaThucHienCongViecTo2KT = 16800
+
+update cv.ThucHienCongViecTo2KTs set TrangThai = 'TT_P' where MaThucHienCongViecTo2KT = 16800
+- Kết thúc ThucHienCongViecTo2KTCTs trước
+- kết thúc at time
+- Kết thúc hoàn toàn ngày làm việc  

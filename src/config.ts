@@ -10,7 +10,7 @@ const CONFIG = {
   LOG_PATH: process.env.LOG_PATH || './logs',
   NODE_ENV: process.env.NODE_ENV || 'development',
   TOOLS: {
-    KHAI_BAO_NGHI_TUAN: '/api/services/app/KhaiBaoNgayNghi/DangKyNghiTuan',
+    KHAI_BAO_NGHI_TUAN: '/api/services/app/TuanAnhAppServices/DangKyNghiTuan',
     STATUS: {
       CHECK: '/api/services/app/Session/GetCurrentLoginInformations'
     },
@@ -18,7 +18,7 @@ const CONFIG = {
       GET_ALL: '/api/services/app/NhanVien/GetAll',
       GET_BY_ID: '/api/services/app/NhanVien/Get'
     },
-    BREAKFAST: {
+    BREAKFAST: {  
       REGISTER: '/api/services/app/AnSang/DangKyAnSang2'
     },
     HOA_CHAT: {
@@ -32,14 +32,15 @@ const CONFIG = {
       DELETE: '/api/services/app/TuanAnhAppServices/DeleteLenhDieuXeMay'
     },
     TUANANH: {
-      CHUYEN_NHAN_VIEN_THI_CONG: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan',
-      PHAN_CONG_NHAN_VIEN_KY_THUAT: '/api/services/app/MangCap4/PhanCongNhanVienKyThuat',
+      UPDATE_NHAN_VIEN_CHUC_VU: '/api/services/app/TuanAnhAppServices/UpdateNhanVienChucVu',
+      CHUYEN_NHAN_VIEN_THI_CONG_GIAO_KHOAN: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienThiCongGiaoKhoan',
+      PHAN_CONG_NHAN_VIEN_KY_THUAT_MANG_CAP_4: '/api/services/app/MangCap4/PhanCongNhanVienKyThuat',
       MO_IN_LAI_PHIEU_XUAT_KHO: '/api/services/app/TuanAnhAppServices/MoInLaiPhieuXuatKhoVatTu',
       UPDATE_TTHS_MANG_CAP4: '/api/services/app/TuanAnhAppServices/UpdateTTHSMangCap4',
       THEM_NHAN_VIEN_SXN: '/api/services/app/TuanAnhAppServices/ThemNhanVienCongViecSXN',
       CHUYEN_NHAN_VIEN_KY_THUAT_GIAO_KHOAN: '/api/services/app/TuanAnhAppServices/ChuyenNhanVienKyThuatGiaoKhoan',
       GET_LENH_DIEU_XE_MAY: '/api/services/app/TuanAnhAppServices/GetLenhDieuXeMay',
-      PHAN_CONG_NHAN_VIEN_THI_CONG: '/api/services/app/MangCap4/PhanCongNhanVienThiCong',
+      PHAN_CONG_NHAN_VIEN_THI_CONG_MANG_CAP_4: '/api/services/app/MangCap4/PhanCongNhanVienThiCong',
       PHAN_CONG_NHAN_VIEN_THI_CONG_LIST: '/api/services/app/TuanAnhAppServices/PhanCongNhanVienThiCongList',
       CHUYEN_HO_SO_MIEN_PHI_TRAM_NAM_DAN: '/api/services/app/QuyetToanMangCap4/ChuyenHoSoMienPhiTramNamDan',
       DANG_KY_DIEU_DONG: '/api/services/app/TuanAnhAppServices/DangKyDieuDong'
@@ -66,6 +67,9 @@ const CONFIG = {
     },
     MANG_CAP4: {
       GET_ALL: '/api/services/app/MangCap4/GetAll'
+    },
+    PHUONG: {
+      GET_ALL: '/api/services/app/Phuong/GetAll'
     }
   }
 };

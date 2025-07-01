@@ -8,7 +8,7 @@ export class ChuyenNhanVienKyThuatGiaoKhoanService {
 
   async chuyenNhanVienKyThuatGiaoKhoan(input: ChuyenNhanVienKyThuatGiaoKhoanInput) {
     try {
-      this.logger.debug('Calling chuyen nhan vien ky thuat giao khoan API', {
+      this.logger.debug('Calling chuyen nhan vien ky thuat (Bản Giao Khoán) API', {
         url: CONFIG.TOOLS.TUANANH.CHUYEN_NHAN_VIEN_KY_THUAT_GIAO_KHOAN,
         input
       });
@@ -20,7 +20,7 @@ export class ChuyenNhanVienKyThuatGiaoKhoanService {
       );
       
       this.logger.debug('API Response received', { response });
-      this.logger.info('Successfully transferred technical employee', { input });
+      this.logger.info('Successfully transferred technical employee (Bản Giao Khoán)', { input });
       
       return response.result;
     } catch (error: any) {
@@ -29,7 +29,7 @@ export class ChuyenNhanVienKyThuatGiaoKhoanService {
         stack: error.stack,
         response: error.response?.data
       });
-      this.logger.error('Error transferring technical employee', { error, input });
+      this.logger.error('Error transferring technical employee (Bản Giao Khoán)', { error, input });
       throw error;
     }
   }
